@@ -25,6 +25,7 @@
                         <span class="ml-4">Users</span>
                     </a>
                 </li>
+                @if(\Route::has('shops'))
                 <li class="my-2">
                     <a href="{{ route('shops') }}" class="nav-link {{ request()->routeIs('shops') ? 'active' : '' }}">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -33,6 +34,7 @@
                         <span class="ml-4">Shops</span>
                     </a>
                 </li>
+                @endif
             </ul>
         </div>
     </div>

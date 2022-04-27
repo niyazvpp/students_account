@@ -18,7 +18,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::select('id', 'name', 'email', 'contact', 'loyalty')->get();
+        $users = User::select('id', 'name', 'email', 'mobile')->get();
         return view('add-user', [ 'users' => $users, 'header' => 'Users', 'desc' => 'Add and or Edit Users As you Wish!' ]);
     }
 
@@ -30,6 +30,56 @@ class UserController extends Controller
     public function create()
     {
         //
+    }
+
+    public function users($type = 'teacher')
+    {
+        $teachers = User::where('user_type', $type)->get();
+        $header = ucfirst($type . 's');
+        $desc = "Add, View and or Edit $header As you Wish!";
+        return view('teachers', compact('teachers', 'header', 'desc'));
+    }
+
+    public function parents()
+    {
+        return $this->users('parent');
+    }
+
+    public function addTeacher(Request $request)
+    {
+        $teacher = $this->addUser($request, 'teacher');
+        return response()->json([
+            'status' => 'success',
+            'data' => $teacher,
+            'message' => "Teacher Added Successfully",
+        ], 201);
+    }
+
+    public function addParent($details)
+    {
+        $teacher = $this->addUser($details, 'parent');
+        return response()->json([
+            'status' => 'success',
+            'data' => $teacher,
+            'message' => "Teacher Added Successfully",
+        ], 201);
+    }
+
+    private function addUser($details, $user_type)
+    {
+        Validator::make($details->all(), [
+            'name' => 'required|min:5|max:255',
+            'email' => 'required|email|max:255',
+            'username' => 'required|min:4|unique:users,username',
+            'mobile' => 'required|numeric|digits:10',
+            'old_balance' => 'nullable|numeric|min:0',
+            'password' => ['required', Rules\Password::defaults()],
+        ])->validate();
+        if ($user_type == 'parent') {
+            $details->old_balance = 0;
+        }
+        $details->user_type = $user_type;
+        return User::create($details->all());
     }
 
     /**

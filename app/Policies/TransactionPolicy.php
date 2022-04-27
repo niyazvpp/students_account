@@ -2,11 +2,11 @@
 
 namespace App\Policies;
 
-use App\Models\Shop;
+use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class ShopPolicy
+class TransactionPolicy
 {
     use HandlesAuthorization;
 
@@ -25,10 +25,10 @@ class ShopPolicy
      * Determine whether the user can view the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Shop  $shop
+     * @param  \App\Models\Transaction  $transaction
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function view(User $user, Shop $shop)
+    public function view(User $user, Transaction $transaction)
     {
         //
     }
@@ -48,10 +48,10 @@ class ShopPolicy
      * Determine whether the user can update the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Shop  $shop
+     * @param  \App\Models\Transaction  $transaction
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function update(User $user, Shop $shop)
+    public function update(User $user, Transaction $transaction)
     {
         //
     }
@@ -60,10 +60,10 @@ class ShopPolicy
      * Determine whether the user can delete the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Shop  $shop
+     * @param  \App\Models\Transaction  $transaction
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function delete(User $user, Shop $shop)
+    public function delete(User $user, Transaction $transaction)
     {
         //
     }
@@ -72,10 +72,10 @@ class ShopPolicy
      * Determine whether the user can restore the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Shop  $shop
+     * @param  \App\Models\Transaction  $transaction
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function restore(User $user, Shop $shop)
+    public function restore(User $user, Transaction $transaction)
     {
         //
     }
@@ -84,10 +84,10 @@ class ShopPolicy
      * Determine whether the user can permanently delete the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\Shop  $shop
+     * @param  \App\Models\Transaction  $transaction
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function forceDelete(User $user, Shop $shop)
+    public function forceDelete(User $user, Transaction $transaction)
     {
         //
     }

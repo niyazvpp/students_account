@@ -17,7 +17,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'user_type', 'loyalty', 'contact'
+        'name', 'username', 'email', 'password', 'user_type', 'mobile', 'old_balance'
     ];
 
     /**
@@ -37,4 +37,29 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function expenses()
+    {
+        return $this->hasMany(Transaction::class, 'reciever_id');
+    }
+
+    public function deposits()
+    {
+        return $this->hasMany(Transaction::class, 'sender_id');
+    }
+
+    public function getTotalIncomeAttributes()
+    {
+        return $this->expenses()->sum('amount');
+    }
+
+    public function getTotalExpensesAttributes()
+    {
+        return $this->deposits()->sum('amount');
+    }
+
+    public function getBalanceAttribute()
+    {
+        return $this->oldBalance +  $this->total_expenses;
+    }
 }

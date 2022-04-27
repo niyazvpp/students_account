@@ -23,11 +23,11 @@ Route::get('/dashboard', function () {
     return redirect()->route('users');
 })->middleware(['auth'])->name('dashboard');
 
-Route::middleware(['auth', 'user_type:admin'])->group(function () {
+Route::middleware('web')->group(function () {
     Route::get('/users', [UserController::class, 'index'])->name('users');
     Route::post('/users', [UserController::class, 'store'])->name('addUsers');
-    Route::get('/shops', [ShopController::class, 'index'])->name('shops');
-    Route::post('/shops', [ShopController::class, 'store'])->name('addShops');
+    Route::get('/teachers', [UserController::class, 'users'])->name('teachers');
+    Route::get('/parents', [UserController::class, 'parents'])->name('parents');
 });
 
 

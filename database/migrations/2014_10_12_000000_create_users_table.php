@@ -19,23 +19,24 @@ class CreateUsersTable extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('username')->unique();
             $table->string('email')->unique();
             $table->string('user_type')->nullable();
-            $table->bigInteger('contact');
-            $table->date('loyalty')->nullable();
+            $table->bigInteger('mobile')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->bigInteger('old_balance')->default(0);
             $table->rememberToken();
             $table->timestamps();
         });
 
         $user = User::create([
             'name' => 'Admin',
+            'username' => 'admin',
             'email' => 'admin@test.com',
             'password' => Hash::make('admin123'),
             'user_type' => 'admin',
-            'loyalty' => date('Y-m-d'),
-            'contact' => 9999997778,
+            'mobile' => 9999997778,
         ]);
 
         event(new Registered($user));

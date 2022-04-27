@@ -5,9 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Shop extends Model
+class Transaction extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'address', 'loyalty'];
+    protected $fillable = [
+        'reciever_id', 'sender_id', 'amount'
+    ];
 }
