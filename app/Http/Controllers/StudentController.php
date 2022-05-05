@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Student;
 use App\Http\Requests\StoreStudentRequest;
 use App\Http\Requests\UpdateStudentRequest;
+use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
 
 class StudentController extends Controller
 {
@@ -16,7 +19,9 @@ class StudentController extends Controller
      */
     public function index()
     {
-        //
+        // show all users with usertype student with student meta
+        $students = Student::with(['user', 'class'])->get();
+        return view('students', compact('students'));
     }
 
     public function generateParents()
@@ -59,7 +64,17 @@ class StudentController extends Controller
      */
     public function store(StoreStudentRequest $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|min:5|max:255',
+            'email' => 'required|email|max:255',
+            'mobile' => 'required|numeric|digits:10|unique:users,mobile',
+            'old_balance' => 'nullable|numeric|min:0',
+            'password' => ['required', Password::defaults()],
+            // add student meta
+        ]);
+        $request->put('password', Hash::make($request->password));
+        $request->put('user_type', 'student');
+        return User::create($request->all());
     }
 
     /**

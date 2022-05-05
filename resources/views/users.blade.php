@@ -2,7 +2,7 @@
 
 @section('main')
 
-<div class="px-8 py-4 my-6">
+<div class="">
    <div class="w-full">
 
         @php
@@ -27,7 +27,7 @@
             </div>
         </div>
 
-   </div>  
+   </div>
 </div>
 
 @endsection

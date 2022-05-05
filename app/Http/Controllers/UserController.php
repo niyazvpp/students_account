@@ -24,16 +24,6 @@ class UserController extends Controller
         return view('add-user', [ 'users' => $users, 'header' => 'Users', 'desc' => 'Add and or Edit Users As you Wish!' ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
     public function parents()
     {
         $usersData = User::where('user_type', 'parent')->with(['students.user'])->get();
@@ -70,6 +60,12 @@ class UserController extends Controller
         return response()->json([
             'status' => 'success',
         ], 200);
+    }
+
+    public function editTeacher(Request $request, User $user = null)
+    {
+        $teacher = $this->editUser($request, $user, 'teacher');
+        return $teacher;
     }
 
     public function users($type)
@@ -127,34 +123,13 @@ class UserController extends Controller
         ], $status);
     }
 
-    public function editTeacher(Request $request, User $user = null)
-    {
-        $teacher = $this->editUser($request, $user, 'teacher');
-        return $teacher;
-    }
-
-    // public function editParent(Request $request, User $user = null)
-    // {
-    //     return $this->editUser($request, $user, 'parent');
-    // }
-
-    public function addParent($details)
-    {
-        $parent = $this->insertUser($details, 'parent');
-        return response()->json([
-            'status' => 'success',
-            'data' => $parent,
-            'message' => "Parent Added Successfully",
-        ], 201);
-    }
-
     private function insertUser($details, $user_type)
     {
         $details = collect($details->all());
         Validator::make($details->all(), [
             'name' => 'required|min:5|max:255',
             'email' => 'required|email|max:255',
-            'username' => 'required|min:4|unique:users,username',
+            'username' => 'required|min:5|unique:users,username',
             'mobile' => 'required|numeric|digits:10|unique:users,mobile',
             'old_balance' => 'nullable|numeric|min:0',
             'password' => ['required', Rules\Password::defaults()],
@@ -173,7 +148,7 @@ class UserController extends Controller
         Validator::make($details->all(), [
             'name' => 'required|min:5|max:255',
             'email' => 'required|email|max:255',
-            'username' => ['required','min:4', Rule::unique('users')->ignore($user)],
+            'username' => ['required','min:5', Rule::unique('users')->ignore($user)],
             'mobile' => ['required', 'numeric', 'digits:10', Rule::unique('users')->ignore($user)],
             'old_balance' => 'required|numeric|min:0',
             'password' => ['nullable', Rules\Password::defaults()],

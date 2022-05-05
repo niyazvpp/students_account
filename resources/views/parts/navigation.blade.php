@@ -1,6 +1,6 @@
-<nav class="sm:col-span-2 min-h-screen">
-    <div class="card rounded-none h-full border-r">
-        <div class="px-8 py-4">
+<nav class="sm:col-span-2 hidden sm:block h-screen overflow-y-auto sticky top-0">
+    <div class="bg-gray-800 sm:flex flex-col justify-start rounded-none h-full">
+        <div class="px-8 py-2">
             <div class="my-4 flex items-center justify-center">
                 <div class="text-blue-600">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-14 w-14" viewBox="0 0 20 20" fill="currentColor">
@@ -10,7 +10,7 @@
                 <div class="text-gray-600 font-black rounded-full bg-yellow-400" style="padding: 2px 7px; transform: rotate(-30deg) translate(-20px, -17px); transform-origin: top; font-size: 0.75rem;">
                     ₹
                 </div>
-                <div class="text-2xl text-gray-700 ml-0 -translate-x-2 mr-auto font-semibold">
+                <div class="text-2xl text-gray-200 ml-0 -translate-x-2 mr-auto font-semibold">
                     dashboard
                 </div>
             </div>
@@ -52,6 +52,11 @@
                 </li>
                 @endif
             </ul>
+        </div>
+        <div class="px-4 py-4 grow flex items-end justify-center">
+            <div class="text-gray-400 text-xs font-normal text-center">
+                Copyright &copy; {{ date('Y') }} <br> Dashboard | Darul Hasanath
+            </div>
         </div>
     </div>
 </nav>

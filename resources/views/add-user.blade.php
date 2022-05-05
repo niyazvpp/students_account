@@ -8,13 +8,12 @@
     }
 </style>
 
-<div class="px-8 py-4 my-6" x-data='app()' x-cloak>
- <div class="w-full">
+ <div class="w-full" x-data='app()'>
 
     <div class="card">
         <div class="card-body">
 
-        
+
             <div class="overflow-x-auto py-4">
 
                 <form action="" method="POST" @submit.prevent="submit($event)">
@@ -87,7 +86,7 @@
                                             <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"/>
                                         </svg>
                                     </button>
-                                    
+
                                     <template x-for="(p, i) in pages" :key="i">
                                         <div>
                                             <template x-if="currentPage != p">
@@ -254,7 +253,6 @@
 </div>
 </div>
 
-</div>  
 </div>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.5.3"></script>
 <script type="text/javascript">
@@ -485,7 +483,7 @@
                       shouldSort: true,
                       keys: ['name', 'email'],
                       threshold: 0
-                  };                
+                  };
                   const fuse = new Fuse(data, options);
                   data = fuse.search(this.searchInput).map(elem => elem.item);
               }
@@ -555,7 +553,7 @@
                 return 0;
             }
             return this.sorted.rule == 'asc' ? a - b : b - a;
-        }); 
+        });
     },
     sort(field) {
         this.sorted.rule = this.sorted.field != field ? 'asc' : this.sorted.rule == 'desc' ? 'asc' : 'desc';

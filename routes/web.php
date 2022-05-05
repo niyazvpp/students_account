@@ -4,6 +4,7 @@ use App\Http\Controllers\ClassesController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ShopController;
+use App\Http\Controllers\StudentController;
 use Illuminate\Support\Facades\DB;
 
 /*
@@ -30,13 +31,19 @@ require __DIR__.'/auth.php';
 Route::middleware('auth')->group(function () {
     // Route::get('/users', [UserController::class, 'index'])->name('users');
     // Route::post('/users', [UserController::class, 'store'])->name('addUsers');
-    
+
     Route::get('classes', [ClassesController::class, 'index'])->name('classes');
     Route::post('classes/edit', [ClassesController::class, 'editClass'])->name('classes.edit');
 
-    // TEACHERS & PARENTS
+    //PARENTS
     Route::get('/parents', [UserController::class, 'parents'])->name('parents');
     Route::post('/parents/edit', [UserController::class, 'editParent'])->name('parents.edit');
+
+    // STUDENTS
+    Route::get('/students', [StudentController::class, 'index'])->name('students');
+    Route::post('/students/edit', [StudentController::class, 'edit'])->name('students.edit');
+
+    // TEACHERS
     Route::get('/{type}', [UserController::class, 'users'])->name('users');
     Route::post('/{type}/edit', [UserController::class, 'editUser'])->name('users.edit');
 });

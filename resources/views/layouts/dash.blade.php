@@ -7,23 +7,28 @@
 
         <title>{{ config('app.name', 'Admin Panel') }}</title>
 
-        <!-- Fonts -->
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap">
 
         <!-- Styles -->
-        <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+        @php
+            $version = session('version') || 1;
+            $version_ = $version + 1;
+            session(['version' => $version_]);
+        @endphp
+        <link rel="stylesheet" href="{{ asset('css/app.css') }}?ver={{ $version }}">
 
         <!-- Scripts -->
         <script src="{{ asset('js/app.js') }}" defer></script>
     </head>
-    <body class="font-sans antialiased bg-gray-50 min-h-screen">
+    <body class="font-sans antialiased bg-gray-100 min-h-screen">
 
         <div class="sm:grid sm:grid-cols-12 h-full">
         @include('parts.navigation')
 
         <main class="sm:col-span-10">
             @include('parts.header')
-            @yield('main')
+            <div class="px-4 sm:px-8 py-4 my-6" style="margin-top: -250px;">
+                @yield('main')
+            </div>
         </main>
         </div>
         @include('alert')

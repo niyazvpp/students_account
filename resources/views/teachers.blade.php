@@ -1,10 +1,10 @@
 @extends('layouts.dash')
 
 @section('main')
-<div class="px-8 py-4 my-6" x-data>
+<div class="" x-data>
 
-    <div class="py-6 flex justify-end items-center">
-        <button @click="$dispatch('adduser', 0)" type="button" class="btn btn-blue px-8 py-1.5 my-auto w-max">New {{ ucfirst($type) }}</button>
+    <div class="py-6 flex sm:justify-end justify-center items-center">
+        <button @click="$dispatch('adduser', 0)" type="button" class="btn btn-yellow px-8 py-1.5 my-auto w-max">New {{ ucfirst($type) }}</button>
     </div>
 
    <div class="w-full">
@@ -32,7 +32,7 @@
             </div>
         </div>
 
-   </div>  
+   </div>
 </div>
 
 <div x-data='modal()'
@@ -41,7 +41,7 @@ x-show="open" @adduser.window="show($event.detail)" class="fixed z-10 inset-0 ov
     >
       <!--
         Background overlay, show/hide based on modal state.
-  
+
         Entering: "ease-out duration-300"
           From: "opacity-0"
           To: "opacity-100"
@@ -56,13 +56,13 @@ x-show="open" @adduser.window="show($event.detail)" class="fixed z-10 inset-0 ov
       x-transition:leave="transition ease-in duration-300"
       x-transition:leave-start="opacity-100"
       x-transition:leave-end="opacity-0"></div>
-  
+
       <!-- This element is to trick the browser into centering the modal contents. -->
       <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-  
+
       <!--
         Modal panel, show/hide based on modal state.
-  
+
         Entering: "ease-out duration-300"
           From: "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           To: "opacity-100 translate-y-0 sm:scale-100"
@@ -86,7 +86,7 @@ x-show="open" @adduser.window="show($event.detail)" class="fixed z-10 inset-0 ov
             <h3 class="text-lg leading-6 mb-4 font-semibold text-gray-900" x-text="add ? 'Add New {{ ucfirst($type) }}' : 'Edit {{ ucfirst($type) }}'">
               Add New {{ ucfirst($type) }}
             </h3>
-            
+
             <div class="grid grid-cols-3">
               <div class="form-group col-span-2">
                 <label for="name" class="label">Name:</label>
@@ -149,7 +149,7 @@ x-show="open" @adduser.window="show($event.detail)" class="fixed z-10 inset-0 ov
         </div>
       </div>
     </div>
-  </div> 
+  </div>
 
   <script type="text/javascript">
     function modal() {
