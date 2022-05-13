@@ -69,7 +69,7 @@ class User extends Authenticatable
 
     public function getBalanceAttribute()
     {
-        return ($this->old_balance + $this->total_income) - $this->total_expenses;
+        return ($this->old_balance + $this->total_income) - $this->total_expenses - ($this->user_type == 'admin' ? User::where('id', '<>', $this->id)->sum('old_balance') : 0) ;
     }
 
     public function class()

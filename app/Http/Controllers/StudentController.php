@@ -163,6 +163,7 @@ class StudentController extends Controller
             $user = User::create([
                 'name' => $student->name,
                 'username' => $student->ad_no,
+                'old_balance' => $student->old_balance,
                 'password' => Hash::make('student' . $student->ad_no),
                 'user_type' => 'student',
             ]);

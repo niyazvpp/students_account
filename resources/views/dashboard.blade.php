@@ -118,7 +118,7 @@
 
                 </form>
 
-                <button class="btn bg-red-400 text-white" @click="$refs.deleteAll.submit()">
+                <button class="btn bg-red-400 text-white" @click.prevent="confirm('Sure to Delete All Students?') && $refs.deleteAll.submit()">
                     Delete All
                 </button>
                 <form x-ref="deleteAll" method="POST" action="{{ route('ajax.students.delete_all') }}">

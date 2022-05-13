@@ -17,7 +17,7 @@ class CreateTransactionsTable extends Migration
             $table->id();
             $table->foreignId('sender_id');
             $table->foreignId('reciever_id');
-            $table->unsignedBigInteger('amount');
+            $table->decimal('amount', 13, 4);
             $table->foreignId('created_by')->nullable();
             $table->foreignId('updated_by')->nullable();
             $table->foreignId('category_id')->nullable();
