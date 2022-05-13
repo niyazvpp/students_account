@@ -149,12 +149,16 @@ class StudentController extends Controller
 
         foreach (json_decode($request->students) as $student) {
 
-            Validator::make((array) $student, [
+            $validator = Validator::make((array) $student, [
                 'name' => 'required|min:5|max:255',
                 'old_balance' => 'nullable|numeric|min:0',
                 'ad_no' => 'required|unique:students,ad_no',
                 'class_id' => 'required|exists:classes,id',
             ]);
+
+            if ($validator->fails()) {
+                continue;
+            }
 
             $user = User::create([
                 'name' => $student->name,
