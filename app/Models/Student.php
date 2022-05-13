@@ -28,7 +28,7 @@ class Student extends Model
 
     public function getparentPasswordAttribute()
     {
-        return $this->dob->format('d.m.Y');
+        return $this->dob ? $this->dob->format('d.m.Y') : '';
     }
 
     public function user()

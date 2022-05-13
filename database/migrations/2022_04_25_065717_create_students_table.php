@@ -16,7 +16,7 @@ class CreateStudentsTable extends Migration
         Schema::create('students', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->unique();
-            $table->unsignedBigInteger('ad_no')->unique();
+            $table->string('ad_no')->unique();
             $table->date('dob')->nullable();
             $table->foreignId('class_id');
             $table->foreignId('parent_id')->nullable();

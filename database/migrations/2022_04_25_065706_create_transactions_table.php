@@ -18,6 +18,12 @@ class CreateTransactionsTable extends Migration
             $table->foreignId('sender_id');
             $table->foreignId('reciever_id');
             $table->unsignedBigInteger('amount');
+            $table->foreignId('created_by')->nullable();
+            $table->foreignId('updated_by')->nullable();
+            $table->foreignId('category_id')->nullable();
+            $table->string('description')->nullable();
+            $table->string('remarks')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

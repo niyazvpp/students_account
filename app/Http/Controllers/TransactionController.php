@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Transaction;
+use Illuminate\Http\Request;
 use App\Http\Requests\StoreTransactionRequest;
 use App\Http\Requests\UpdateTransactionRequest;
+use App\Models\User;
 
 class TransactionController extends Controller
 {
@@ -18,14 +20,25 @@ class TransactionController extends Controller
         //
     }
 
+    public function dashboard()
+    {
+       return view('dashboard', ['header' => 'Dashboard', 'user' => auth()->user(), 'desc' => 'You can view all the primary data here']);
+    }
+
     /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
-        //
+        if ($request->user()->user_type != 'admin' && $request->user()->user_type != 'teacher') {
+            abort(404);
+        }
+        $user = $request->user();
+        $transactions = $user->transactions();
+        $students = User::with('meta.class')->where('user_type', 'student')->get();
+        return view('transact', ['header' => 'Transact', 'desc' => 'Add or Edit Transactions', 'students' => $students, 'transactions' => $transactions, 'user' => $user]);
     }
 
     /**
@@ -36,7 +49,18 @@ class TransactionController extends Controller
      */
     public function store(StoreTransactionRequest $request)
     {
-        //
+        $user = $request->user();
+        if ($request->transaction_type == 'expense') {
+            $transaction = $user->deposits()->create(
+                array_merge($request->except(['reciever_id', 'sender_id']), ['created_by' => $request->user()->id, 'reciever_id' => $request->other_id ])
+            );
+        }
+        else {
+            $transaction = $user->expenses()->create(
+                array_merge($request->except(['reciever_id', 'sender_id']), ['created_by' => $request->user()->id, 'sender_id' => $request->other_id ])
+            );
+        }
+        return response()->json(['message' => 'Transaction Created Successfully', 'status' => 'success', 'transaction' => $transaction], 201);
     }
 
     /**
@@ -79,8 +103,13 @@ class TransactionController extends Controller
      * @param  \App\Models\Transaction  $transaction
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Transaction $transaction)
+    public function delete(Request $request)
     {
-        //
+        $transaction = Transaction::findOrFail($request->delete_id);
+        $transaction->delete();
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Transaction Deleted Successfully',
+        ], 200);
     }
 }

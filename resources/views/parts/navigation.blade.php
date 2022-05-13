@@ -1,4 +1,4 @@
-<nav class="sm:col-span-2 hidden sm:block h-screen overflow-y-auto sticky top-0">
+<nav class="sm:col-span-2 sm:block h-screen overflow-y-auto sm:sticky top-0 fixed inset-0 z-10 transition-all duration-1000 ease-in-out" :class="{ 'hidden': !open }">
     <div class="bg-gray-800 sm:flex flex-col justify-start rounded-none h-full">
         <div class="px-8 py-2">
             <div class="my-4 flex items-center justify-center">
@@ -13,11 +13,39 @@
                 <div class="text-2xl text-gray-200 ml-0 -translate-x-2 mr-auto font-semibold">
                     dashboard
                 </div>
+                <button class="text-white sm:hidden focus:outline-none block" @click="open = false">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                </button>
             </div>
         </div>
         <div class="px-4 py-4">
             <ul class="list-none w-full">
                 <li class="my-2">
+                      <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                        </svg>
+                        <span class="ml-4">Dashboard</span>
+                    </a>
+                    <a href="{{ route('transact') }}" class="nav-link {{ request()->routeIs('transact') ? 'active' : '' }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                        </svg>
+                        <span class="ml-4">Transact</span>
+                    </a>
+                    <a href="{{ route('logout') }}" onclick="event.preventDefault(); this.querySelector('form').submit()" class="nav-link">
+                        <form action="{{ route('logout') }}" method="POST">
+                            @csrf
+                        </form>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                          </svg>
+                        <span class="ml-4">Logout</span>
+                    </a>
+                </li>
+                {{-- <li class="my-2">
                     <a href="{{ route('users', ['type' => 'teachers']) }}" class="nav-link {{ route('users', ['type' => 'teachers']) == url()->current() ? 'active' : '' }}">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -50,7 +78,7 @@
                         <span class="ml-4">Shops</span>
                     </a>
                 </li>
-                @endif
+                @endif --}}
             </ul>
         </div>
         <div class="px-4 py-4 grow flex items-end justify-center">

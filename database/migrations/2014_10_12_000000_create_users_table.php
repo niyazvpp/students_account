@@ -40,6 +40,26 @@ class CreateUsersTable extends Migration
         ]);
 
         event(new Registered($user));
+
+        for ($i=1; $i < 11; $i++) {
+            $user = User::create([
+                'name' => 'Class Teacher ' . $i,
+                'username' => 'classteacher' . $i,
+                'password' => Hash::make('classteacher' . $i),
+                'user_type' => 'teacher',
+            ]);
+
+            event(new Registered($user));
+        }
+
+        $user = User::create([
+            'name' => 'Class Teacher Hifz',
+            'username' => 'classteacherhifz',
+            'password' => Hash::make('classteacherhifz'),
+            'user_type' => 'teacher',
+        ]);
+
+        event(new Registered($user));
     }
 
     /**

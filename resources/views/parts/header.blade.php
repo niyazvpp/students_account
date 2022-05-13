@@ -1,4 +1,4 @@
-<div class="flex justify-start bg-blue-700" style="padding-bottom: 250px;">
+<div class="flex justify-start bg-gradient-to-r from-cyan-500 to-blue-500 shadow">
     <div class="sm:hidden pl-4 py-2 flex items-center justify-center">
         <div class="text-blue-600">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" stroke="white" viewBox="0 0 20 20" fill="currentColor">
@@ -31,7 +31,7 @@
 			  <span class="absolute right-0 top-0 inline-flex rounded-full h-2 w-2 bg-red-600"></span>
 			</span>
 		</div>
-        <button class="text-stone-300 ml-3 relative block sm:hidden focus:outline-none">
+        <button @click="open = true" class="text-stone-300 ml-3 relative block sm:hidden focus:outline-none">
 			<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd" />
             </svg>

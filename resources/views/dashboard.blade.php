@@ -2,82 +2,38 @@
 
 @section('main')
 
-   <div class="sm:grid sm:grid-cols-2 w-full">
+   <div class="w-full">
 
 
-       <div class="space-y-6">
+       <div>
 
-        <div class="card shadow-lg w-full">
-            <div class="card-body">
-                <h3 class="text-xl font-bold text-gray-600 mb-4 flex justify-start items-center">Overview <div class="text-gary-600 h-6 w-6 ml-1 inline-flex justify-center items-center bg-yellow-400 rounded-full">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
-                    </svg>
-                </div></h3>
-                <div class="sm:grid sm:grid-cols-12">
-                    <div class="px-4 col-span-8">
-                        <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve">
-                            <g>
-                                <g>
-                                    <path style="fill:#5D647F;" d="M472,72H40C17.945,72,0,89.945,0,112v288c0,22.055,17.945,40,40,40h432c22.055,0,40-17.945,40-40    V112C512,89.945,494.055,72,472,72z"/>
-                                </g>
-                                <g>
-                                    <path style="fill:#FFD100;" d="M176,232H80c-8.837,0-16-7.163-16-16v-64c0-8.837,7.163-16,16-16h96c8.837,0,16,7.163,16,16v64    C192,224.837,184.837,232,176,232z"/>
-                                </g>
-                                <g>
-                                    <g>
-                                        <path style="fill:#B8BAC0;" d="M120,336H80c-8.837,0-16-7.163-16-16v-8c0-8.837,7.163-16,16-16h40c8.837,0,16,7.163,16,16v8     C136,328.837,128.837,336,120,336z"/>
-                                    </g>
-                                    <g>
-                                        <path style="fill:#B8BAC0;" d="M224,336h-40c-8.837,0-16-7.163-16-16v-8c0-8.837,7.163-16,16-16h40c8.837,0,16,7.163,16,16v8     C240,328.837,232.837,336,224,336z"/>
-                                    </g>
-                                    <g>
-                                        <path style="fill:#B8BAC0;" d="M328,336h-40c-8.837,0-16-7.163-16-16v-8c0-8.837,7.163-16,16-16h40c8.837,0,16,7.163,16,16v8     C344,328.837,336.837,336,328,336z"/>
-                                    </g>
-                                    <g>
-                                        <path style="fill:#B8BAC0;" d="M432,336h-40c-8.837,0-16-7.163-16-16v-8c0-8.837,7.163-16,16-16h40c8.837,0,16,7.163,16,16v8     C448,328.837,440.837,336,432,336z"/>
-                                    </g>
-                                </g>
-                                <g>
-                                    <g>
-                                        <path style="fill:#8A8895;" d="M232,384H72c-4.422,0-8-3.582-8-8s3.578-8,8-8h160c4.422,0,8,3.582,8,8S236.422,384,232,384z"/>
-                                    </g>
-                                </g>
-                                <g>
-                                    <g>
-                                        <path style="fill:#8A8895;" d="M336,384h-72c-4.422,0-8-3.582-8-8s3.578-8,8-8h72c4.422,0,8,3.582,8,8S340.422,384,336,384z"/>
-                                    </g>
-                                </g>
-                                <g>
-                                    <path style="fill:#FF4F19;" d="M368,216.002C359.211,225.821,346.439,232,332.224,232c-26.51,0-48-21.49-48-48s21.49-48,48-48    c14.213,0,26.983,6.177,35.772,15.993"/>
-                                </g>
-                                <g>
-                                    <polygon style="fill:#FF9500;" points="192,192 112,192 112,176 192,176 192,160 112,160 112,136 96,136 96,232 112,232 112,208     192,208   "/>
-                                </g>
-                                <g>
-                                    <circle style="fill:#FFD100;" cx="400" cy="184" r="48"/>
-                                </g>
-                            </g>
-
-                        </svg>
+        <div class="sm:grid sm:grid-cols-2 px-4 sm:px-0">
+            <div class="btn my-4 sm:my-0 flex justify-center flex-col sm:rounded-r-none bg-blue-400">
+                <div class="text-2xl font-medium">₹ {{ $user->balance }}</div>
+                <div class="text-sm font-normal">Balance</div>
+            </div>
+            <div>
+                <div class="btn py-2 my-4 sm:my-0 flex justify-center flex-col sm:rounded-b-none sm:rounded-l-none bg-green-400">
+                    <div class="text-xl font-medium">₹ {{ $user->total_income }}</div>
+                        <div class="text-sm font-normal">Deposit</div>
                     </div>
-                    <div class="px-3 col-span-4 sm:text-right text-center sm:border-l flex py-0 max-h-full justify-center flex-col">
-                        <div class="text-3xl text-blue-400 font-bold">₹ 25000</div>
-                        <div class="text-xs text-gray-400 mb-6">Current Balance</div>
-
-                        <div class="text-2xl text-green-400 font-bold">₹ 25000</div>
-                        <div class="text-xs text-gray-400 mb-6">Deposits</div>
-
-                        <div class="text-2xl text-red-400 font-bold">₹ 25000</div>
-                        <div class="text-xs text-gray-400 mb-6">Expenses</div>
+                <div class="btn py-2 my-4 sm:my-0 flex justify-center flex-col sm:rounded-t-none sm:rounded-l-none bg-red-400">
+                    <div class="text-xl font-medium">₹ {{ $user->total_expenses }}</div>
+                        <div class="text-sm font-normal">Expense</div>
                     </div>
                 </div>
-
             </div>
         </div>
 
-
-           <div class="card shadow-lg w-full">
+        <a href="{{ route('transact') }}">
+            <div class="underline text-blue-400 hover:text-blue-500 text-center mt-12">
+                Start Transactions
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+            </div>
+        </a>
+           {{-- <div class="card shadow-lg w-full">
                <div class="card-body w-full py-4 overflow-x-auto">
                    <h3 class="text-xl font-medium text-gray-600 mb-4">Latest Transactions</h3>
                    <table class="min-w-max w-full table-auto">
@@ -106,7 +62,7 @@
                        </tbody>
                    </table>
                </div>
-           </div>
+           </div> --}}
        </div>
 
 
@@ -119,6 +75,166 @@
             ['a', 'b', 'c', 'd'],
         ];
        @endphp
+
+       @if($user->user_type == 'admin')
+
+       <div class="card mt-6" x-data="app()">
+        <div class="card-body overflow-x-auto">
+            <div class="bg-white form-container px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <form @submit.prevent="submit($event.target)" action="{{ route('ajax.students') }}" method="POST" autocomplete="off">
+                  @csrf
+                  <h3 class="text-lg leading-6 mb-4 font-semibold text-gray-900 capitalize">
+                    Add Students in Bulk
+                  </h3>
+
+
+                    {{-- <div class="form-group">
+                        <label for="students" class="btn bg-gray-200 border shadow-none border-gray-300 text-gray-600  block text-center cursor-pointer">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                            </svg>
+                            Upload Students</label>
+                        <input name="students" id="students" class="hidden" accept=".xlsx" type="file">
+                        <small class="text-red-500 error"></small>
+                    </div> --}}
+
+                    <div class="form-group">
+                        <label for="students" class="label">Paste Students Excel</label>
+                        <textarea name="students" id="students" class="input" rows="10"></textarea>
+                        <small class="text-red-500 error"></small>
+                    </div>
+
+                      <div class="form-group mt-4">
+                          <button type="submit" class="btn btn-blue w-full flex items-center justify-center" :class="{ 'opacity-30': loading }" :disabled="loading">
+                              <template x-if="loading">
+                                    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                              </template>
+                              <span x-text="loading ? 'Processing...' : 'Process'"></span>
+                          </button>
+                      </div>
+
+                </form>
+
+                <button class="btn bg-red-400 text-white" @click="$refs.deleteAll.submit()">
+                    Delete All
+                </button>
+                <form x-ref="deleteAll" method="POST" action="{{ route('ajax.students.delete_all') }}">
+                    @csrf
+                </form>
+              </div>
+        </div>
+    </div>
+
+    <script>
+        function app() {
+            return {
+                loading: false,
+                reset() {
+                    document.querySelectorAll(".form-group").forEach(formGroup => {
+                        formGroup.classList.remove("validated");
+                    });
+                },
+                calculated(data){
+                    let returnData = [];
+                    data = data.trim();
+                    data.split('\n').forEach(row => {
+                        if(row.length > 0){
+                            let columns = row.split('\t');
+                            if (columns[0].trim() == '' || columns[1].trim() == '' || columns[2].trim() == '' || columns[3].trim() == '')
+                                return false;
+                            let student = {
+                                ad_no: columns[0],
+                                name: columns[1],
+                                class_id: columns[2],
+                                old_balance: columns[3],
+                                user_type: 'student',
+                            };
+                            returnData.push(student);
+                        }
+                    });
+                    return returnData;
+                },
+                loading2: false,
+                truncate(form) {
+                    if (this.loading2) return false;
+                    this.loading2 = true;
+                    fetch(form.action, {
+                        body: new FormData(form),
+                        method: form.method ? form.method : "POST",
+                        headers: {
+                        "Accept": "application/json",
+                        }
+                    })
+                    .then(res => res.json())
+                    .then(json => {
+                        console.log(json);
+                        this.loading2 = false;
+                        if (json.status == "success") {
+                            this.$dispatch('alpine-show-message', {
+                                type: 'success',
+                                data: json.message,
+                            });
+                            setTimeout(() => {
+                                window.location = '';
+                            }, 1000);
+                        }
+                        if (json.errors) {
+                            this.$dispatch('alpine-show-message', {
+                                type: 'error',
+                                data: json.message,
+                            });
+                        }
+                    }).catch(e => {
+                        console.log(e);
+                        this.loading2 = false;
+                    });
+                },
+                submit(form) {
+                    if (this.loading || form.querySelector('[name="students"]').value =='') return false;
+                    this.loading = true;
+                    this.reset();
+                    var data = new FormData();
+                    data.append('_token', '{{ csrf_token() }}');
+                    data.append('students', JSON.stringify(this.calculated(form.querySelector('[name="students"]').value)));
+                    fetch(form.action, {
+                        body: data,
+                        method: form.method ? form.method : "POST",
+                        headers: {
+                        "Accept": "application/json",
+                        }
+                    })
+                    .then(res => res.json())
+                    .then(json => {
+                        console.log(json);
+                        this.loading = false;
+                        if (json.status == "success") {
+                            this.$dispatch('alpine-show-message', {
+                                type: 'success',
+                                data: json.message,
+                            });
+                            form.querySelector('[name="students"]').value = '';
+                        }
+                        if (json.errors) {
+                        Object.keys(json.errors).forEach(name => {
+                            var obj = form.querySelector("[name=" + name +"]");
+                            var error = json.errors[name][0];
+                            obj.closest(".form-group").classList.add("validated");
+                            obj.closest(".form-group").querySelector(".error").innerHTML = error;
+                        });
+                        }
+                    }).catch(e => {
+                        console.log(e);
+                        this.loading = false;
+                    });
+                }
+            };
+        }
+    </script>
+
+       @endif
 
        <!-- <div class="card shadow-lg w-full">
            <div class="card-body w-full py-4">

@@ -48,8 +48,8 @@ class ClassesController extends Controller
     {
         $details = collect($details->all());
         Validator::make($details->all(), [
-            'name' => 'required|min:5|max:255|unique:classes',
-            'fullname' => 'required|min:5|max:255|unique:classes',
+            'name' => 'required|min:4|max:255|unique:classes',
+            'fullname' => 'required|min:4|max:255|unique:classes',
             'teacher_id' => [
                 'nullable',
                 Rule::exists('users', 'id')->where(function ($query) {

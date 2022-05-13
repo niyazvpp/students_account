@@ -38,29 +38,38 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    protected $appends = [
+        'balance',
+    ];
+
     public function expenses()
     {
-        return $this->hasMany(Transaction::class, 'reciever_id');
+        return $this->hasMany(Transaction::class, 'reciever_id')->with('reciever');
     }
 
     public function deposits()
     {
-        return $this->hasMany(Transaction::class, 'sender_id');
+        return $this->hasMany(Transaction::class, 'sender_id')->with('sender');
     }
 
-    public function getTotalIncomeAttributes()
+    public function transactions()
     {
-        return $this->expenses()->sum('amount');
+        return collect($this->deposits()->limit(25)->get())->merge($this->expenses()->limit(25)->get())->sortByDesc('created_at')->values();
     }
 
-    public function getTotalExpensesAttributes()
+    public function getTotalIncomeAttribute()
     {
         return $this->deposits()->sum('amount');
     }
 
+    public function getTotalExpensesAttribute()
+    {
+        return $this->expenses()->sum('amount');
+    }
+
     public function getBalanceAttribute()
     {
-        return $this->oldBalance + $this->total_expenses;
+        return ($this->old_balance + $this->total_income) - $this->total_expenses;
     }
 
     public function class()

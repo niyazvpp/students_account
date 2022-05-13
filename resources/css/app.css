@@ -17,8 +17,11 @@
         @apply bg-yellow-400 hover:bg-yellow-500 focus:ring-yellow-400;
     }
 	.input {
-		@apply bg-gray-50 block text-sm focus:shadow-none focus:ring-1 focus:ring-blue-400 appearance-none rounded-xl w-full py-2 px-4 text-gray-700 mb-3 leading-tight focus:outline-none focus:bg-white border border-gray-200 focus:border-blue-400 transition-all duration-200 ease-in-out;
+		@apply block text-sm focus:shadow-none focus:ring-1 focus:ring-blue-400 appearance-none rounded-xl w-full py-2 px-4 text-gray-700 mb-3 leading-tight focus:outline-none focus:bg-white border border-gray-300 focus:border-blue-400 transition-all duration-200 ease-in-out;
 	}
+    .input[disabled] {
+        @apply bg-gray-100 cursor-not-allowed;
+    }
 	.form-group .input {
 		@apply mb-1;
 	}
@@ -55,4 +58,8 @@
 	.form-group {
 		@apply py-1 pr-3 text-left text-gray-700;
 	}
+
+    .not-active {
+        @apply opacity-40;
+    }
 }

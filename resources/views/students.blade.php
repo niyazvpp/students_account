@@ -12,17 +12,16 @@
         @php
 
         $headers = ['Id', 'Name', 'Username', 'Email', 'Mobile', 'Old Balance', 'Edit'];
-        array_merge(['Id', 'Name', 'Username', 'Email', 'Mobile', 'Old Balance'], $type == 'teacher' ? ['Class'] : [], ['Edit']);
         $body = [];
         foreach ($users as $count => $user) {
-            $body[] = array_merge([
+            $body[] = [
                 $count * 1 + 1,
                 $user->name,
                 $user->username,
                 $user->email,
                 $user->mobile,
                 $user->old_balance,
-            ], $type == 'teacher' ? [($user->class ? $user->class->name : '')] : [],['<button @click="$dispatch(\'adduser\', ' . $user->id . ')" class="btn text-gray-600 bg-gray-100 border border-gray-200 shadow-none">Edit</button>']);
+                '<button @click="$dispatch(\'adduser\', ' . $user->id . ')" class="btn text-gray-600 bg-gray-100 border border-gray-200 shadow-none">Edit</button>'];
         }
 
         @endphp
@@ -81,30 +80,28 @@ x-show="open" @adduser.window="show($event.detail)" class="fixed z-10 inset-0 ov
         x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
 
         <div class="bg-white form-container px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-          <form @submit.prevent="submit($event.target)" action="{{ route('users.edit', ['type' => $type . 's']) }}" method="POST">
+          <form @submit.prevent="submit($event.target)" action="{{ route('students.edit']) }}" method="POST">
             @csrf
-            <input type="hidden" name="user" id="user" :value="{{ $type }}.id">
-            <h3 class="text-lg leading-6 mb-4 font-semibold text-gray-900" x-text="add ? 'Add New {{ ucfirst($type) }}' : 'Edit {{ ucfirst($type) }}'">
-              Add New {{ ucfirst($type) }}
+            <input type="hidden" name="user" id="user" :value="student.id">
+            <h3 class="text-lg leading-6 mb-4 font-semibold text-gray-900" x-text="add ? 'Add New Student' : 'Edit Student'">
+              Add New Student
             </h3>
 
             <div class="grid grid-cols-3">
               <div class="form-group col-span-2">
                 <label for="name" class="label">Name:</label>
-                <input name="name" :value="{{ $type }}.name" id="name" type="text" class="input">
+                <input name="name" :value="student.name" id="name" type="text" class="input">
                 <small class="text-red-500 error"></small>
               </div>
               <div class="form-group">
                 <label for="old_balance" class="label">Old Balance:</label>
-                <input name="old_balance" :value="{{ $type }}.old_balance" id="old_balance" type="number" value="0" class="input">
+                <input name="old_balance" :value="student.old_balance" id="old_balance" type="number" value="0" class="input">
                 <small class="text-red-500 error"></small>
               </div>
             </div>
 
-            @if($type == 'teacher')
-
               <div class="form-group col-span-2">
-                <label for="class" class="label">Assign Class</label>
+                <label for="class" class="label">Select Class</label>
                 <select name="class" :value="teacher.class ? teacher.class.id : ''" id="class" type="text" class="input">
                   <option value=""> --- Not Now --- </option>
                   <template x-for="classe in classes">
@@ -115,17 +112,15 @@ x-show="open" @adduser.window="show($event.detail)" class="fixed z-10 inset-0 ov
                 <small class="text-red-500 error"></small>
               </div>
 
-            @endif
-
             <div class="sm:grid sm:grid-cols-2">
               <div class="form-group">
                 <label for="email" class="label">Email:</label>
-                <input name="email" :value="{{ $type }}.email" id="email" type="email" class="input">
+                <input name="email" :value="student.email" id="email" type="email" class="input">
                 <small class="text-red-500 error"></small>
               </div>
               <div class="form-group">
                 <label for="mobile" class="label">Mobile:</label>
-                <input name="mobile" :value="{{ $type }}.mobile" id="mobile" type="number" class="input">
+                <input name="mobile" :value="student.mobile" id="mobile" type="number" class="input">
                 <small class="text-red-500 error"></small>
               </div>
             </div>
@@ -133,12 +128,12 @@ x-show="open" @adduser.window="show($event.detail)" class="fixed z-10 inset-0 ov
             <div class="sm:grid sm:grid-cols-2">
               <div class="form-group">
                 <label for="username" class="label">Username:</label>
-                <input name="username" :value="{{ $type }}.username" id="username" type="text" class="input">
+                <input name="username" :value="student.username" id="username" type="text" class="input">
                 <small class="text-red-500 error"></small>
               </div>
               <div class="form-group">
                 <label for="password" class="label">Password:</label>
-                <input name="password" :value="{{ $type }}.password" id="password" type="password" class="input">
+                <input name="password" :value="student.password" id="password" type="password" class="input">
                 <small class="text-red-500 error"></small>
               </div>
             </div>
@@ -169,16 +164,16 @@ x-show="open" @adduser.window="show($event.detail)" class="fixed z-10 inset-0 ov
     open: false,
     loading: false,
     add: true,
-    {{ $type }}s: {!! $usersData->toJson() !!},
-    {{ $type }}: {
+    students: {!! $usersData->toJson() !!},
+    student: {
       id: 0,
       old_balance: 0,
       class: {}
     },
     show(id = 0) {
       this.open = true;
-      var filtered = this.{{ $type }}s.filter({{ $type }} => {{ $type }}.id == id);
-      this.{{ $type }} = filtered.length ? filtered[0] : {
+      var filtered = this.students.filter(student => student.id == id);
+      this.student = filtered.length ? filtered[0] : {
         id: 0,
         old_balance: 0,
         class: {}

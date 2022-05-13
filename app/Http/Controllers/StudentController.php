@@ -7,7 +7,10 @@ use App\Http\Requests\StoreStudentRequest;
 use App\Http\Requests\UpdateStudentRequest;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
 
 class StudentController extends Controller
@@ -120,5 +123,67 @@ class StudentController extends Controller
     public function destroy(Student $student)
     {
         //
+    }
+
+    public function truncate(Request $request)
+    {
+        if ($request->user()->user_type != 'admin') {
+            abort(404);
+        }
+        User::where('user_type', 'student')->delete();
+        Student::truncate();
+        return back()->with('message', 'All Students Deleted!');
+    }
+
+    public function ajaxStudents(Request $request)
+    {
+        if ($request->user()->user_type != 'admin' || !$request->wantsJson()) {
+            abort(404);
+        }
+
+        $request->validate([
+            'students' => 'required|json',
+        ]);
+
+        $count = 0;
+
+        foreach (json_decode($request->students) as $student) {
+
+            Validator::make((array) $student, [
+                'name' => 'required|min:5|max:255',
+                'old_balance' => 'nullable|numeric|min:0',
+                'ad_no' => 'required|unique:students,ad_no',
+                'class_id' => 'required|exists:classes,id',
+            ]);
+
+            $user = User::create([
+                'name' => $student->name,
+                'username' => $student->ad_no,
+                'password' => Hash::make('student' . $student->ad_no),
+                'user_type' => 'student',
+            ]);
+
+            event(new Registered($user));
+
+            Student::create([
+                'user_id' => $user->id,
+                'class_id' => $student->class_id,
+                'ad_no' => $student->ad_no
+            ]);
+
+            $count++;
+        }
+
+        if (!$count) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No Valid Student'
+            ], 422);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => $count . ' students updated!',
+        ], 201);
     }
 }
