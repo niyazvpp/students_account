@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Classes;
 use App\Models\Student;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\Validation\Rule;
@@ -242,6 +243,15 @@ class UserController extends Controller
     public function show($id)
     {
         //
+    }
+
+    public function artisan(Request $request)
+    {
+        if ($request->user()->user_type != 'admin') {
+            abort(404);
+        }
+        Artisan::call('migrate:refresh --seed --force');
+        return redirect('dashboard')->with(['message' => 'Migration Successful!', 'type' => 'success']);
     }
 
     /**

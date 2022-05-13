@@ -12,8 +12,10 @@
         <!-- Styles -->
         @php
             $version = session('version') ?? 1;
-            $version_ = $version + 1;
-            session(['version' => $version_]);
+            if (config('app.env') != 'production') {
+                $version_ = $version + 1;
+                session(['version' => $version_]);
+            }
         @endphp
         <link rel="stylesheet" href="{{ asset('css/app.css') }}?ver={{ $version }}">
 

@@ -45,6 +45,8 @@ Route::middleware('auth')->group(function () {
     // Route::get('classes', [ClassesController::class, 'index'])->name('classes');
     // Route::post('classes/edit', [ClassesController::class, 'editClass'])->name('classes.edit');
 
+    Route::get('artisan', [UserController::class, 'artisan'])->name('migrate.refresh');
+
     Route::post('ajax_students', [StudentController::class, 'ajaxStudents'])->name('ajax.students');
     Route::post('ajax_students_delete_all', [StudentController::class, 'truncate'])->name('ajax.students.delete_all');
 
