@@ -147,16 +147,19 @@ class StudentController extends Controller
 
         $count = 0;
 
+        $errors = [];
+
         foreach (json_decode($request->students) as $student) {
 
             $validator = Validator::make((array) $student, [
-                'name' => 'required|min:5|max:255',
+                'name' => 'required|min:2|max:255',
                 'old_balance' => 'nullable|numeric',
                 'ad_no' => 'required|unique:students,ad_no',
                 'class_id' => 'required|exists:classes,id',
             ]);
 
             if ($validator->fails()) {
+                $errors[$student->ad_no] = $validator->errors();
                 continue;
             }
 
@@ -182,13 +185,15 @@ class StudentController extends Controller
         if (!$count) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'No Valid Student'
+                'message' => 'No Valid Student',
+                'errors' => $errors
             ], 422);
         }
 
         return response()->json([
             'status' => 'success',
             'message' => $count . ' students updated!',
+            'errors' => $errors
         ], 201);
     }
 }
