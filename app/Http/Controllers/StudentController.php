@@ -151,7 +151,7 @@ class StudentController extends Controller
 
             $validator = Validator::make((array) $student, [
                 'name' => 'required|min:5|max:255',
-                'old_balance' => 'nullable|numeric|min:0',
+                'old_balance' => 'nullable|numeric',
                 'ad_no' => 'required|unique:students,ad_no',
                 'class_id' => 'required|exists:classes,id',
             ]);

@@ -143,7 +143,7 @@
                     data.split('\n').forEach(row => {
                         if(row.length > 0){
                             let columns = row.split('\t');
-                            if (columns[0].trim() == '' || columns[1].trim() == '' || columns[2].trim() == '' || columns[3].trim() == '')
+                            if (columns[0] == '' || columns[1] == '' || columns[2] == '' || columns[3] == '')
                                 return false;
                             let student = {
                                 ad_no: columns[0],

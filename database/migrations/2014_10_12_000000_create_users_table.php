@@ -25,7 +25,7 @@ class CreateUsersTable extends Migration
             $table->bigInteger('mobile')->unique()->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->bigInteger('old_balance')->default(0);
+            $table->decimal('old_balance', 13, 4)->default(0);
             $table->rememberToken();
             $table->timestamps();
         });
