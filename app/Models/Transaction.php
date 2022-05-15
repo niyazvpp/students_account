@@ -14,6 +14,10 @@ class Transaction extends Model
         'reciever_id', 'sender_id', 'amount', 'description', 'category_id', 'remarks', 'created_by', 'updated_by'
     ];
 
+    protected $casts = [
+        'amount' => 'decimal:2',
+    ];
+
     public function sender()
     {
         return $this->belongsTo(User::class, 'sender_id');

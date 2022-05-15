@@ -8,7 +8,7 @@
    </thead>
    <tbody class="text-gray-300 text-sm font-light">
         @foreach ($body as $tr)
-            <tr class="border-b border-gray-100">
+            <tr {{ $tr_attributes }} class="border-b border-gray-100">
                 @foreach ($tr as $td)
                     <td class="py-4 pr-3 text-left text-gray-700">{!! $td !!}</td>
                 @endforeach

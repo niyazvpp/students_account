@@ -157,7 +157,7 @@ class UserController extends Controller
         if ($user_type == 'parent') {
             $details->put('old_balance', 0);
         }
-        if (!empty($details->password))
+        if (!empty($details->get('password')))
             $details->put('password', Hash::make($details->get('password')));
         else $details->forget('password');
 
@@ -234,22 +234,16 @@ class UserController extends Controller
         ]);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
+    public function teacher(User $teacher)
     {
-        //
+        $teacher->load('class');
+        return view('teacher', compact('teacher'));
     }
 
     public function artisan(Request $request)
     {
-        if ($request->user()->user_type != 'admin') {
-            abort(404);
-        }
+        (new StudentController)->backup();
+
         Artisan::call('migrate:refresh --seed --force');
         return redirect('dashboard')->with(['message' => 'Migration Successful!', 'type' => 'success']);
     }

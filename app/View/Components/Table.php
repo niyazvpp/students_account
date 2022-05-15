@@ -16,10 +16,13 @@ class Table extends Component
 
     public $body;
 
-    public function __construct($headers, $body)
+    public $tr_attributes;
+
+    public function __construct($headers, $body, $tr_attributes = '')
     {
         $this->headers = $headers;
         $this->body = $body;
+        $this->tr_attributes = $tr_attributes;
     }
 
     /**

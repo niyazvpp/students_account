@@ -44,12 +44,12 @@ class User extends Authenticatable
 
     public function expenses()
     {
-        return $this->hasMany(Transaction::class, 'reciever_id')->with('reciever');
+        return $this->hasMany(Transaction::class, 'reciever_id')->with('sender');
     }
 
     public function deposits()
     {
-        return $this->hasMany(Transaction::class, 'sender_id')->with('sender');
+        return $this->hasMany(Transaction::class, 'sender_id')->with('reciever');
     }
 
     public function transactions()
@@ -59,17 +59,20 @@ class User extends Authenticatable
 
     public function getTotalIncomeAttribute()
     {
-        return $this->deposits()->sum('amount');
+        $number = $this->deposits()->sum('amount');
+        return round($number, 2);
     }
 
     public function getTotalExpensesAttribute()
     {
-        return $this->expenses()->sum('amount');
+        $number = $this->expenses()->sum('amount');
+        return round($number, 2);
     }
 
     public function getBalanceAttribute()
     {
-        return ($this->old_balance + $this->total_income) - $this->total_expenses - ($this->user_type == 'admin' ? User::where('id', '<>', $this->id)->sum('old_balance') : 0) ;
+        $number = ($this->old_balance + $this->total_income) - $this->total_expenses + ($this->user_type == 'admin' ? User::where('id', '<>', $this->id)->sum('old_balance') : 0) ;
+        return round($number, 2);
     }
 
     public function class()
@@ -86,5 +89,15 @@ class User extends Authenticatable
     public function students()
     {
         return $this->hasMany(Student::class, 'parent_id');
+    }
+
+    public function is($type)
+    {
+        return $this->user_type == $type;
+    }
+
+    public function isAdmin()
+    {
+        return $this->is('admin');
     }
 }

@@ -25,6 +25,7 @@
             </div>
         </div>
 
+        @if (auth()->user()->is('teacher') || auth()->user()->is('admin'))
         <a href="{{ route('transact') }}">
             <div class="underline text-blue-400 hover:text-blue-500 text-center mt-12">
                 Start Transactions
@@ -33,48 +34,9 @@
                 </svg>
             </div>
         </a>
-           {{-- <div class="card shadow-lg w-full">
-               <div class="card-body w-full py-4 overflow-x-auto">
-                   <h3 class="text-xl font-medium text-gray-600 mb-4">Latest Transactions</h3>
-                   <table class="min-w-max w-full table-auto">
-                       <thead>
-                           <tr class="text-gray-400 font-light text-sm leading-normal">
-                               <th class="font-normal text-left pr-3">Reciever/Sender</th>
-                               <th class="font-normal text-left pr-3">Type</th>
-                               <th class="font-normal text-left pr-3">Date</th>
-                               <th class="font-normal text-left pr-3">Amount</th>
-                           </tr>
-                       </thead>
-                       <tbody class="text-gray-300 text-sm font-light">
-                           <tr class="border-b border-gray-100">
-                               <td class="py-3 pr-3 text-left">
-                                   <div class="inline-flex justify-start items-center">
-                                       <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                          <path stroke-linecap="round" stroke-linejoin="round" d="M16 17l-4 4m0 0l-4-4m4 4V3" />
-                                        </svg>
-                                        <span class="text-gray-600 font-normal">Muhammed Niyaz</span>
-                                   </div>
-                               </td>
-                               <td class="py-3 pr-3 text-left">NIOS Exam Fee</td>
-                               <td class="py-3 pr-3 text-left">18/05/2021</td>
-                               <td class="py-3 pr-3 text-left font-medium text-gray-600">NIOS Exam Fee</td>
-                           </tr>
-                       </tbody>
-                   </table>
-               </div>
-           </div> --}}
-       </div>
+        @endif
+    </div>
 
-
-
-       @php
-        $headers = ['a', 'b', 'c', 'd'];
-        $data = [
-            ['a', 'b', 'c', 'd'],
-            ['a', 'b', 'c', 'd'],
-            ['a', 'b', 'c', 'd'],
-        ];
-       @endphp
 
        @if($user->user_type == 'admin')
 
@@ -235,13 +197,6 @@
     </script>
 
        @endif
-
-       <!-- <div class="card shadow-lg w-full">
-           <div class="card-body w-full py-4">
-               <h3 class="text-xl font-medium text-gray-600 mb-4">Latest Transactions</h3>
-               <x-table :body="$data" :headers="$headers" />
-           </div>
-       </div> -->
 
 
    </div>

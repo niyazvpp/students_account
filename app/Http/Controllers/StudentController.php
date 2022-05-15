@@ -5,11 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\Student;
 use App\Http\Requests\StoreStudentRequest;
 use App\Http\Requests\UpdateStudentRequest;
+use App\Models\Classes;
+use App\Models\Transaction;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
 
@@ -195,5 +198,32 @@ class StudentController extends Controller
             'message' => $count . ' students updated!',
             'errors' => $errors
         ], 201);
+    }
+
+    public function backup()
+    {
+        $contents = [];
+        $contents['students'] = Student::all();
+        $contents['transactions'] = Transaction::all();
+        $contents['users'] = User::all();
+        $contents['classes'] = Classes::all();
+
+        $name = 'backup/backup_json';
+        while(Storage::exists($name . '.json')) {
+            $name .= '_-_';
+        }
+        $name .= '.json';
+        Storage::put($name, json_encode($contents));
+        return $name;
+    }
+
+    public function export(Request $request)
+    {
+        if ($request->user()->user_type != 'admin') {
+            abort(404);
+        }
+
+        $name = $this->backup();
+        return Storage::download($name);
     }
 }
