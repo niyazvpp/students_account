@@ -21,8 +21,13 @@
 
         <!-- Scripts -->
         <script src="{{ asset('js/app.js') }}" defer></script>
+        <style>
+            [x-cloak] {
+                display: none;
+            }
+        </style>
     </head>
-    <body class="font-sans antialiased bg-gray-100 min-h-screen">
+    <body class="font-sans antialiased bg-gray-100 min-h-screen" x-data x-cloak>
 
         <div class="sm:grid sm:grid-cols-12 h-full" x-data="{ open: false}">
         @include('parts.navigation')
