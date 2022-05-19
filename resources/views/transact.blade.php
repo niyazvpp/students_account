@@ -384,10 +384,12 @@ x-show="open" @view-transaction.window="show($event.detail)" class="fixed z-10 i
                 const options = {
                 shouldSort: true,
                 keys: ['name', 'meta.ad_no', 'class.name'],
-                threshold: 0
+                threshold: 0.5,
+                findAllMatches: true,
             };
             const fuse = new Fuse(this.students, options);
             data = fuse.search(this.ad_no).map(result => result.item);
+
         }
         return data;
         },
