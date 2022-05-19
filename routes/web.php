@@ -66,14 +66,14 @@ Route::middleware(['auth', 'user_type:admin'])->group(function () {
     Route::post('ajax_students', [StudentController::class, 'ajaxStudents'])
                         ->middleware(['ajax_only'])
                         ->name('ajax.students');
-    Route::post('students_delete_all', [StudentController::class, 'truncate'])
-                        ->middleware(['no_ajax', 'password.confirm'])
-                        ->name('ajax.students.delete_all');
+    // Route::post('students_delete_all', [StudentController::class, 'truncate'])
+    //                     ->middleware(['no_ajax', 'password.confirm'])
+    //                     ->name('ajax.students.delete_all');
 
     Route::get('export_backup', [StudentController::class, 'export'])->name('export_backup');
-    Route::get('artisan', [UserController::class, 'artisan'])
-                        ->middleware(['no_ajax', 'password.confirm'])
-                        ->name('migrate.refresh');
+    // Route::get('artisan', [UserController::class, 'artisan'])
+    //                     ->middleware(['no_ajax', 'password.confirm'])
+    //                     ->name('migrate.refresh');
 
     Route::get('classes', [ClassesController::class, 'index'])->name('classes');
     Route::post('classes/edit', [ClassesController::class, 'editClass'])->name('classes.edit');
