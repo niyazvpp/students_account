@@ -29,37 +29,6 @@ class CreateUsersTable extends Migration
             $table->rememberToken();
             $table->timestamps();
         });
-
-        $user = User::create([
-            'name' => 'Admin',
-            'username' => 'admin',
-            'email' => 'admin@darulhasanath.com',
-            'password' => Hash::make('adminhasanath'),
-            'user_type' => 'admin',
-            'mobile' => 9999997778,
-        ]);
-
-        event(new Registered($user));
-
-        for ($i=1; $i < 11; $i++) {
-            $user = User::create([
-                'name' => 'Class Teacher ' . $i,
-                'username' => 'classteacher' . $i,
-                'password' => Hash::make('classteacher' . $i),
-                'user_type' => 'teacher',
-            ]);
-
-            event(new Registered($user));
-        }
-
-        $user = User::create([
-            'name' => 'Class Teacher Hifz',
-            'username' => 'classteacherhifz',
-            'password' => Hash::make('classteacherhifz'),
-            'user_type' => 'teacher',
-        ]);
-
-        event(new Registered($user));
     }
 
     /**

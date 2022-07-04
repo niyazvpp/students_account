@@ -11,12 +11,24 @@ class Transaction extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'reciever_id', 'sender_id', 'amount', 'description', 'category_id', 'remarks', 'created_by', 'updated_by'
+        'reciever_id', 'sender_id', 'amount', 'description', 'category_id', 'remarks', 'created_by', 'updated_by', 'created_at', 'updated_at'
     ];
 
-    protected $casts = [
-        'amount' => 'decimal:2',
+    protected $appends = [
+        'category'
     ];
+
+
+
+    public function getAmountAttribute($value)
+    {
+        return round($value, 2);
+    }
+
+    public function getCategoryAttribute()
+    {
+        return $this->belongsTo(Category::class, 'category_id')->value('name');
+    }
 
     public function sender()
     {

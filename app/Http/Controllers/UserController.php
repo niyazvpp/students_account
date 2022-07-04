@@ -240,12 +240,13 @@ class UserController extends Controller
         return view('teacher', compact('teacher'));
     }
 
-    public function artisan(Request $request)
+    public function artisan(Request $request, $refresh = false)
     {
+        $command = $refresh ? 'migrate:refresh --seed' : 'migrate:refresh --seed';
         (new StudentController)->backup();
 
-        Artisan::call('migrate:refresh --seed --force');
-        return redirect('dashboard')->with(['message' => 'Migration Successful!', 'type' => 'success']);
+        Artisan::call($command);
+        // return redirect('dashboard')->with(['message' => 'Migration Successful!', 'type' => 'success']);
     }
 
     /**

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ClassesController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
@@ -38,10 +39,14 @@ Route::middleware(['auth', 'user_type:teacher,admin'])->group(function () {
     // Route::get('/users', [UserController::class, 'index'])->name('users');
     // Route::post('/users', [UserController::class, 'store'])->name('addUsers');
 
+    Route::post('ajax', [TransactionController::class, 'ajax'])->name('ajax');
+
     Route::get('transact', [TransactionController::class, 'create'])->name('transact');
     Route::post('transact', [TransactionController::class, 'store']);
     Route::post('transactions/delete', [TransactionController::class, 'delete'])->name('transactions.delete');
-    Route::post('transactions', [TransactionController::class, 'index'])->name('transactions');
+    Route::get('transactions', [TransactionController::class, 'index'])->name('transactions');
+    Route::get('categories', [CategoryController::class, 'index'])->name('categories');
+    Route::post('categories/edit', [CategoryController::class, 'editCategory'])->name('categories.edit');
 
 
 
@@ -63,9 +68,15 @@ Route::middleware(['auth', 'user_type:teacher,admin'])->group(function () {
 
 Route::middleware(['auth', 'user_type:admin'])->group(function () {
 
+    Route::post('transactions/update', [TransactionController::class, 'update'])->name('transactions.update');
+
     Route::post('ajax_students', [StudentController::class, 'ajaxStudents'])
                         ->middleware(['ajax_only'])
                         ->name('ajax.students');
+
+    Route::post('ajax_transactions', [TransactionController::class, 'ajaxTransactions'])
+                        ->middleware(['ajax_only'])
+                        ->name('ajax.transactions');
     // Route::post('students_delete_all', [StudentController::class, 'truncate'])
     //                     ->middleware(['no_ajax', 'password.confirm'])
     //                     ->name('ajax.students.delete_all');
@@ -82,4 +93,8 @@ Route::middleware(['auth', 'user_type:admin'])->group(function () {
     Route::get('/{type}', [UserController::class, 'users'])->name('users');
     Route::post('/{type}/edit', [UserController::class, 'editUser'])->name('users.edit');
     Route::get('teacher/{teacher}', [UserController::class, 'teacher'])->name('teacher');
+
+    Route::post('import', [StudentController::class, 'import'])->name('import');
+
+    Route::get('excel_export', [TransactionController::class, 'export'])->name('transactions.export');
 });

@@ -54,7 +54,7 @@ class User extends Authenticatable
 
     public function transactions()
     {
-        return collect($this->deposits()->limit(25)->get())->merge($this->expenses()->limit(25)->get())->sortByDesc('created_at')->values();
+        return Transaction::where('sender_id', $this->id)->orWhere('reciever_id', $this->id)->with('sender', 'reciever')->latest();
     }
 
     public function getTotalIncomeAttribute()
@@ -71,7 +71,7 @@ class User extends Authenticatable
 
     public function getBalanceAttribute()
     {
-        $number = ($this->old_balance + $this->total_income) - $this->total_expenses + ($this->user_type == 'admin' ? User::where('id', '<>', $this->id)->sum('old_balance') : 0) ;
+        $number = ($this->old_balance + $this->total_income) - $this->total_expenses;
         return round($number, 2);
     }
 

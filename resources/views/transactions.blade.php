@@ -8,130 +8,10 @@
     <div class="sm:grid sm:grid-cols-12">
 
 
-        <div class="col-span-3 order-last pl-4 sm:pr-0 pr-4 pb-4 sm:pb-0">
-            <div class="justify-center flex">
-                <button @click="transaction_type = 'deposit'" class="btn block w-full rounded-r-none bg-green-400 focus:outline-none" :class="{ 'not-active bg-gray-300': transaction_type != 'deposit' }">
-                    Deposit
-                </button>
-                <button @click="transaction_type = 'expense'" class="btn block w-full bg-red-400 focus:outline-none rounded-l-none" :class="{ 'not-active bg-gray-300': transaction_type != 'expense' }">
-                    Expense
-                </button>
-            </div>
-        </div>
-
-
             <div class="col-span-9">
 
-                <div class="card">
-                    <div class="card-body overflow-x-auto">
-                        <template x-if="transaction_type">
-                        <div class="bg-white form-container px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                            <form @submit.prevent="submit($event.target)" action="" method="POST" autocomplete="off">
-                              @csrf
-                              <input type="hidden" name="other_id" :value="student.id">
-                              <input type="hidden" name="transaction_type" :value="transaction_type">
-                              <h3 class="text-lg leading-6 mb-4 font-semibold text-gray-900 capitalize">
-                                New <span x-text="transaction_type"></span>
-                              </h3>
 
-                              <div class="sm:grid sm:grid-cols-2">
-
-                                <div class="form-group relative">
-                                    <label for="ad_no" class="label">Admission No:</label>
-                                    <input @input.debounce="ad_no = $event.target.value; stop = false; searchStudents()" :value="ad_no" name="ad_no" id="ad_no" type="text" class="input">
-                                    <div x-show="ad_no && !stop && !student.name" class="shadow-lg py-1 bg-white z-10 absolute border right-3 left-0 rounded-lg">
-                                        <ul class="overflow-y-auto" style="max-height: 100px;">
-                                          <template x-for="result in students">
-                                            <li @click="ad_no = result.meta.ad_no; stop = true; student = getStudent()" class="border-b py-1 cursor-pointer px-2 py-1 hover:bg-gray-50 text-sm" x-text="result.meta.ad_no + ' - ' + result.name + ' - ' + result.meta.class.name"></li>
-                                          </template>
-                                          <template x-if="!students.length">
-                                            <li class="px-2 py-1 text-sm" x-text="loading ? 'Searching...' : 'No Result Found!'"></li>
-                                          </template>
-                                        </ul>
-                                      </div>
-                                    <small class="text-red-500 error"></small>
-                                  </div>
-
-
-                                  <div class="form-group">
-                                    <label for="balance" class="label">Balance:</label>
-                                    <input name="balance" id="balance" disabled :value="student.balance" type="text" class="input bg-gray-200">
-                                    <small class="text-red-500 error"></small>
-                                  </div>
-
-                              </div>
-
-                              <div class="sm:grid sm:grid-cols-12">
-
-                                <div class="form-group sm:col-span-9">
-                                  <label for="name" class="label">Name:</label>
-                                  <input name="name" id="name" disabled :value="student.name" type="text" class="input bg-gray-200">
-                                  <small class="text-red-500 error"></small>
-                                </div>
-
-                                <div class="form-group sm:col-span-3">
-                                    <label for="class" class="label">Class:</label>
-                                    <input name="class" id="class" disabled :value="student.meta.class.name" type="text" class="input bg-gray-200">
-                                    <small class="text-red-500 error"></small>
-                                  </div>
-
-                              </div>
-
-                              <div class="form-group relative">
-                                <label for="category" class="label">Category:</label>
-                                <input type="hidden" name="category_id" :value="isNaN(category_id) ? category.id : category_id">
-                                <input type="hidden" name="new" :value="category_new">
-                                <input @focus="focused = true" @blur.debounce.500ms="focused = false" @input="category_name = $event.target.value; stopCategorySearch = false; category = getCategory(); category_id = getCategory().id" :value="category_name" name="category_name" id="category_name" type="text" class="input">
-                                <div x-show="(category_name && !stopCategorySearch && !category.name) || (focused && !stopCategorySearch && !category.name)" class="shadow-lg py-1 bg-white z-10 absolute border right-3 left-0 rounded-lg">
-                                    <ul class="overflow-y-auto bg-white" style="max-height: 100px;">
-                                      <template x-for="result in categoryResults()">
-                                        <li @click="category_name = result.name; category_id = result.id; stopCategorySearch = true; category = getCategory(); category_new = result.new || ''" class="border-b py-1 cursor-pointer px-2 hover:bg-gray-50 text-sm">
-                                            <span x-text="result.name"></span>
-                                            <small class="text-green-500 font-normal text-xs" x-show="result.new == 'new'">(Create New)</small>
-                                        </li>
-                                      </template>
-                                      <template x-if="!categoryResults().length">
-                                        <li class="px-2 py-1 text-sm" x-text="'No Result Found!'"></li>
-                                      </template>
-                                    </ul>
-                                  </div>
-                                <small class="text-green-500 font-normal text-xs" x-show="category_new == 'new'">Creating New Category</small>
-                                <small class="text-red-500 error"></small>
-                              </div>
-
-                                <div class="form-group">
-                                    <label for="amount" class="label">Amount:</label>
-                                    <input step=".01" name="amount" id="amount" type="number" class="input py-4 text-xl bg-white">
-                                    <small class="text-red-500 error"></small>
-                                  </div>
-
-                                    <div class="form-group">
-                                        <label for="description" class="label">Description: (Optional)</label>
-                                        <textarea name="description" id="description" class="input bg-white"></textarea>
-                                        <small class="text-red-500 error"></small>
-                                    </div>
-
-                                  <div class="form-group mt-4">
-                                      <button type="submit" class="btn btn-blue w-full flex items-center justify-center" :class="{ 'opacity-30': loading }" :disabled="loading">
-                                          <template x-if="loading">
-                                                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                                </svg>
-                                          </template>
-                                          <span x-text="loading ? 'Processing...' : 'Process'"></span>
-                                      </button>
-                                  </div>
-
-                            </form>
-                          </div>
-
-                        </template>
-                    </div>
-                </div>
-
-
-                <div class="card shadow-lg w-full mt-12 capitalize">
+                <div class="card shadow-lg w-full capitalize">
                     <div class="card-body w-full py-4 overflow-x-auto">
                         <h3 class="text-xl font-medium text-gray-600 mb-4">Latest Transactions</h3>
                         <table class="min-w-max w-full table-auto">
@@ -152,7 +32,7 @@
                                 </tr>
                             </thead>
                             <tbody class="text-gray-300 text-sm font-light">
-                                <template x-for="transaction in transactions">
+                                <template x-for="transaction in showPaginatedTransactions()">
                                     <tr class="border-b border-gray-100 hover:bg-gray-50 cursor-pointer">
                                         <td @click="showTransaction(transaction)" class="py-3 pr-3 text-left">
                                             <div class="inline-flex justify-start items-center">
@@ -160,7 +40,7 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M16 17l-4 4m0 0l-4-4m4 4V3" />
                                                 </svg>
                                                 <div>
-                                                    <div class="text-gray-600 font-normal truncate" x-text="transaction.sender_id == user.id ? transaction.reciever.meta.ad_no + ' ' + transaction.reciever.name : transaction.sender.meta.ad_no + ' ' + transaction.sender.name"></div>
+                                                    <div class="text-gray-600 font-normal truncate" x-text="transaction.sender_id == user.id ? findStudent(transaction.reciever_id).meta.ad_no + ' ' + findStudent(transaction.reciever_id).name : findStudent(transaction.sender_id).meta.ad_no + ' ' + findStudent(transaction.sender_id).name"></div>
                                                     <div class="font-normal" x-text="dateData(transaction.created_at)"></div>
                                                 </div>
                                             </div>
@@ -190,7 +70,8 @@
                         </table>
                         <template x-if="hasLoadMore()">
                             <div class="py-2 px-4 flex justify-center">
-                                <button @click="loadMore()" :disabled="lastTransactionDetails.loading" :class="{ 'opacity-40 focus:ring-0': lastTransactionDetails.loading }" x-text="lastTransactionDetails.loading ? 'Loading...' : 'Load More'" class="btn border text-center block bg-gray-100 text-gray-500">
+                                <button @click="loadMore()" class="btn border text-center block bg-gray-100 text-gray-500">
+                                    Load More
                                 </button>
                             </div>
                         </template>
@@ -274,41 +155,22 @@ x-show="open" @view-transaction.window="show($event.detail)" class="fixed z-10 i
 
                 <div class="flex justify-between">
                     <div>Class</div>
-                    <div class="font-medium" x-text="(transaction.reciever && transaction.reciever.meta && transaction.reciever.meta.class) ? transaction.reciever.meta.class.name : (transaction.sender && transaction.sender.meta && transaction.sender.meta.class) ? transaction.sender.meta.class.name : ''"></div>
+                    <div class="font-medium" x-text="findStudent(transaction.reciever ? transaction.reciever.id : transaction.sender.id).meta.class.name"></div>
                 </div>
 
-                <div class="flex justify-between items-center">
+                <div class="flex justify-between">
                     <div>Amount</div>
-                    @if ($user->isAdmin())
-                        <input type="number" :value="transaction.amount" class="input mb-0 w-max" name="amount" id="transaction_amount">
-                    @else
                     <div class="font-medium" x-text="'₹ ' + transaction.amount"></div>
-                    @endif
                 </div>
 
                 <div class="flex justify-between">
                     <div>Time</div>
-                    @if ($user->isAdmin())
-                        <input type="datetime-local" :value="dateTimeLocal(transaction.created_at)" class="input mb-0 w-max" name="created_at" id="created_at">
-                    @else
                     <div class="font-medium" x-text="dateData(transaction.created_at)"></div>
-                    @endif
                 </div>
 
                 <div class="flex justify-between">
                     <div>Category</div>
-                    @if ($user->isAdmin())
-                        <select class="input mb-0 w-max" name="category_id">
-                            <option value="">Select Category</option>
-                            <template x-if="categories">
-                                <template x-for="category in categories">
-                                    <option :value="category.id" :selected="category.id == transaction.category" x-text="category.name"></option>
-                                </template>
-                            </template>
-                        </select>
-                    @else
                     <div class="font-medium capitalize" x-text="(transaction.category ? transaction.category : '') + (transaction.remarks ? ' ( Return )' : '')"></div>
-                    @endif
                 </div>
 
                 <div class="flex justify-between">
@@ -338,12 +200,6 @@ x-show="open" @view-transaction.window="show($event.detail)" class="fixed z-10 i
                 var date = new Date(date);
                 return date.getDate() + '-' + this.month(date.getMonth()) + '-' + date.getFullYear() + ' ' + this.timeTo12HoursFormat(date);
             },
-            dateTimeLocal(date) {
-                if (!date) return '';
-                var date = new Date(date);
-                date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
-                return date.toISOString().slice(0,16);
-            },
             timeTo12HoursFormat(time){
                 // convert hours to 12 hour format
                 var hours = time.getHours();
@@ -371,6 +227,16 @@ x-show="open" @view-transaction.window="show($event.detail)" class="fixed z-10 i
                 reciever: {},
                 sender: {}
             },
+            findStudent(id) {
+                return this.data.students.find(student => student.id == id) || {
+                    meta: {
+                        class: {
+                            name: '',
+                            id: ''
+                        }
+                    }
+                };
+            },
             show(data) {
                 if (!this.dataAdded) {
                     this.data = JSON.parse(JSON.stringify(data.data));
@@ -378,7 +244,6 @@ x-show="open" @view-transaction.window="show($event.detail)" class="fixed z-10 i
                     this.dataAdded = true;
                 }
                 this.transaction = data.transaction;
-                this.categories = data.categories;
                 this.open = true;
             },
             close() {
@@ -389,101 +254,7 @@ x-show="open" @view-transaction.window="show($event.detail)" class="fixed z-10 i
 
     function app() {
       return {
-        init() {
-            this.loadTransactions();
-        },
-        lastTransactionDetails: {
-            loading: false,
-        },
-        loadTransactions(more = false, url = '{{ route('ajax') }}') {
-            this.lastTransactionDetails.loading = true;
-            var formData = new FormData();
-            formData.append('_token', '{{ csrf_token() }}');
-            formData.append('data', JSON.stringify({
-                action: 'transactions'
-            }));
-            let data = fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                },
-                body: formData,
-            }).then(json => {
-                return json.json();
-            }).then(data => {
-                if (!more)
-                    this.transactions = data.transactions.data;
-                else
-                    this.transactions = this.transactions.concat(data.transactions.data);
-                this.lastTransactionDetails = {...data, loading: false};
-                console.log(this.lastTransactionDetails);
-            });
-        },
-        abortController: false,
-        searchStudents(url = '{{ route('ajax') }}') {
-            this.loading = false;
-            var searched;
-            this.student = {
-                meta: {
-                    ad_no: '',
-                    class: {}
-                }
-            };
-            this.students = [];
-            if (this.trimAndLowerCaseIfString(this.ad_no) == '') {
-                return false;
-            }
-            this.loading = true;
-            if (searched = this.searchedItems.find(item => item.username == this.ad_no)) {
-                this.students = searched.result;
-                this.loading = false;
-                this.student = this.getStudent();
-                return;
-            }
-            if (this.abortController) {
-                this.abortController.abort();
-            }
-            this.abortController = false;
-            this.abortController = new AbortController();
-            var formData = new FormData();
-            formData.append('_token', '{{ csrf_token() }}');
-            formData.append('data', JSON.stringify({
-                action: 'students',
-                inputs: {
-                    search: this.ad_no,
-                    limit: 5
-                }
-            }));
-            let data = fetch(url, {
-                method: 'POST',
-                signal: this.abortController.signal,
-                headers: {
-                    'Accept': 'application/json',
-                },
-                body: formData,
-            }).then(json => {
-                return json.json();
-            }).then(data => {
-                this.students = data.students;
-                this.allStudents = this.addWithoutDuplicates(this.allStudents, this.students);
-                this.loading = false;
-                this.student = this.getStudent();
-            }).catch(err => {
-                console.log(err);
-                this.loading = false;
-            });
-        },
-        addWithoutDuplicates(array, newArray) {
-            newArray.forEach(item => {
-                if (!array.find(item2 => item2.username == item.username)) {
-                    array.push(item);
-                }
-            });
-            return array;
-        },
-        allStudents: [],
-        searchedItems: [],
-        students: [],
+        students: {!! $students->toJson() !!},
         showTransaction(transaction) {
             this.$dispatch('view-transaction',
                 {
@@ -491,19 +262,25 @@ x-show="open" @view-transaction.window="show($event.detail)" class="fixed z-10 i
                         transactions: this.transactions,
                         students: this.students,
                         user: this.user,
-                        categories: this.categories,
                     },
                     transaction: transaction
                 }
             );
         },
+        findStudent(id) {
+            return this.students.find(student => student.id == id);
+        },
         hasLoadMore() {
-            return this.lastTransactionDetails.transactions && this.lastTransactionDetails.transactions.next_page_url;
+            return this.loaded_count < this.transactions.length;
         },
         loadMore() {
-            this.loadTransactions(true, this.lastTransactionDetails.transactions.next_page_url);
+            this.loaded_count += 25;
         },
-        transactions: [],
+        loaded_count: 25,
+        showPaginatedTransactions() {
+            return this.transactions.filter((transaction, index) => index < this.loaded_count);
+        },
+        transactions: {!! $transactions->toJson() !!},
         user: {!! $user->toJson() !!},
         categories: {!! $categories->toJson() !!},
         category_new: false,
@@ -531,14 +308,14 @@ x-show="open" @view-transaction.window="show($event.detail)" class="fixed z-10 i
             });
         },
         stop: false,
-        stopCategorySearch: false,
+        stopCategory: false,
         ad_no: '',
         category_id: '',
         category_name: '',
         loading: false,
         transaction_type: false,
         getStudent() {
-            return this.allStudents.find(student => student.meta.ad_no == this.ad_no) || {
+            return this.students.filter(student => student.meta.ad_no == this.ad_no)[0] || {
             meta: {
               ad_no: '',
               class: {}
@@ -546,7 +323,7 @@ x-show="open" @view-transaction.window="show($event.detail)" class="fixed z-10 i
             };
         },
         getCategory() {
-            return this.categories.find(category => this.trimAndLowerCaseIfString(category.name) == this.trimAndLowerCaseIfString(this.category_name)) || {
+            return this.categories.filter(category => this.trimAndLowerCaseIfString(category.name) == this.trimAndLowerCaseIfString(this.category_name))[0] || {
                 name: '',
                 id: ''
             };
@@ -572,9 +349,8 @@ x-show="open" @view-transaction.window="show($event.detail)" class="fixed z-10 i
             }
             return value;
         },
-        focused: false,
         categoryResults() {
-            var data = this.categories;
+            var data = [];
             if (this.category_name != '' && (!isNaN(this.category_name) || this.category_name.trim() != '')) {
                     const options = {
                     shouldSort: true,
@@ -675,9 +451,6 @@ x-show="open" @view-transaction.window="show($event.detail)" class="fixed z-10 i
             console.log(json);
             this.loading = false;
             if (json.status == "success") {
-                if (json.category) {
-                    this.categories.push(json.category);
-                }
                 this.$dispatch('alpine-show-message', {
                     type: 'success',
                     data: 'Transaction Success!',

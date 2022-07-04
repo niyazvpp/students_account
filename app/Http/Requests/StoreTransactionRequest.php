@@ -23,13 +23,17 @@ class StoreTransactionRequest extends FormRequest
      */
     public function rules()
     {
-        return [
+        $rules = [
             'amount' => 'required|numeric|min:0.5|max:25000',
-            'category_id' => 'nullable|exists:categories,id',
+            'category_id' => 'required',
             'description' => 'nullable|max:255|min:4',
-            'remarks' => 'nullable|max:255|min:4',
+            'remarks' => 'nullable|numeric|exists:transactions,id',
             'other_id' => 'required|exists:users,id|notIn:' . auth()->id(),
             'transaction_type' => 'required|in:expense,deposit',
         ];
+        if ($this->category_id != 0) {
+            $rules['category_id'] = 'required|exists:categories,id';
+        }
+        return $rules;
     }
 }
