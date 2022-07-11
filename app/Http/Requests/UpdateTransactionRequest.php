@@ -23,8 +23,13 @@ class UpdateTransactionRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            //
+        $rules = [
+            'amount' => 'required|numeric|min:0.5|max:25000',
+            'category_id' => 'required|exists:categories,id',
+            'description' => 'nullable|max:255|min:4',
+            'created_at' => 'nullable|datetime',
+            'remarks' => 'nullable|numeric|min:0|lte:amount',
         ];
+        return $rules;
     }
 }

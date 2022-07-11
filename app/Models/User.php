@@ -6,6 +6,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
 
 class User extends Authenticatable
 {
@@ -59,13 +60,13 @@ class User extends Authenticatable
 
     public function getTotalIncomeAttribute()
     {
-        $number = $this->deposits()->sum('amount');
+        $number = $this->deposits()->sum(DB::raw('if(remarks is not null, amount - remarks, amount)')) ?? 0;
         return round($number, 2);
     }
 
     public function getTotalExpensesAttribute()
     {
-        $number = $this->expenses()->sum('amount');
+        $number = $this->expenses()->sum(DB::raw('if(remarks is not null, amount - remarks, amount)')) ?? 0;
         return round($number, 2);
     }
 

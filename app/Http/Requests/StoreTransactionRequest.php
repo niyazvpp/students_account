@@ -27,7 +27,7 @@ class StoreTransactionRequest extends FormRequest
             'amount' => 'required|numeric|min:0.5|max:25000',
             'category_id' => 'required',
             'description' => 'nullable|max:255|min:4',
-            'remarks' => 'nullable|numeric|exists:transactions,id',
+            'remarks' => 'nullable|numeric|min:0|lte:amount',
             'other_id' => 'required|exists:users,id|notIn:' . auth()->id(),
             'transaction_type' => 'required|in:expense,deposit',
         ];

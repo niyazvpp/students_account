@@ -282,10 +282,11 @@ class TransactionController extends Controller
      * @param  \App\Models\Transaction  $transaction
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateTransactionRequest $request, Transaction $transaction)
+    public function update(UpdateTransactionRequest $request)
     {
-        $transaction = $transaction->update($request->all());
-        return response()->json(['message' => 'Transaction Updated Successfully', 'status' => 'success', 'transaction' => $transaction], 201);
+        $transaction = Transaction::findOrFail($request->id);
+        $transaction->update(array_merge($request->all(), ['updated_by' => $request->user()->id]));
+        return response()->json(['message' => 'Transaction Updated Successfully', 'status' => 'success', 'transaction' => $transaction], 200);
     }
 
     /**

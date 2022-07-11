@@ -38,11 +38,11 @@
 
                                 <div class="form-group relative">
                                     <label for="ad_no" class="label">Admission No:</label>
-                                    <input @input.debounce="ad_no = $event.target.value; stop = false; searchStudents()" :value="ad_no" name="ad_no" id="ad_no" type="text" class="input">
+                                    <input @input.debounce="ad_no = trimAndLowerCaseIfString($event.target.value); stop = false; searchStudents()" :value="ad_no" name="ad_no" id="ad_no" type="text" class="input">
                                     <div x-show="ad_no && !stop && !student.name" class="shadow-lg py-1 bg-white z-10 absolute border right-3 left-0 rounded-lg">
                                         <ul class="overflow-y-auto" style="max-height: 100px;">
                                           <template x-for="result in students">
-                                            <li @click="ad_no = result.meta.ad_no; stop = true; student = getStudent()" class="border-b py-1 cursor-pointer px-2 py-1 hover:bg-gray-50 text-sm" x-text="result.meta.ad_no + ' - ' + result.name + ' - ' + result.meta.class.name"></li>
+                                            <li @click="ad_no = result.meta.ad_no; stop = true; student = getStudent()" class="border-b cursor-pointer px-2 py-1 hover:bg-gray-50 text-sm" x-text="result.meta.ad_no + ' - ' + result.name + ' - ' + result.meta.class.name"></li>
                                           </template>
                                           <template x-if="!students.length">
                                             <li class="px-2 py-1 text-sm" x-text="loading ? 'Searching...' : 'No Result Found!'"></li>
@@ -85,13 +85,13 @@
                                 <div x-show="(category_name && !stopCategorySearch && !category.name) || (focused && !stopCategorySearch && !category.name)" class="shadow-lg py-1 bg-white z-10 absolute border right-3 left-0 rounded-lg">
                                     <ul class="overflow-y-auto bg-white" style="max-height: 100px;">
                                       <template x-for="result in categoryResults()">
-                                        <li @click="category_name = result.name; category_id = result.id; stopCategorySearch = true; category = getCategory(); category_new = result.new || ''" class="border-b py-1 cursor-pointer px-2 hover:bg-gray-50 text-sm">
+                                        <li @click="category_name = result.name; category_id = result.id; stopCategorySearch = true; category = getCategory(); category_new = result.new || ''" class="border-b py-2 cursor-pointer px-2 hover:bg-gray-50 text-sm">
                                             <span x-text="result.name"></span>
                                             <small class="text-green-500 font-normal text-xs" x-show="result.new == 'new'">(Create New)</small>
                                         </li>
                                       </template>
                                       <template x-if="!categoryResults().length">
-                                        <li class="px-2 py-1 text-sm" x-text="'No Result Found!'"></li>
+                                        <li class="px-2 py-2 text-sm" x-text="'No Result Found!'"></li>
                                       </template>
                                     </ul>
                                   </div>
@@ -151,7 +151,14 @@
                                     <th class="font-normal text-center pr-3">Action</th>
                                 </tr>
                             </thead>
-                            <tbody class="text-gray-300 text-sm font-light">
+                            <tbody class="text-gray-400 text-sm font-light">
+                                <template x-if="!transactions.length">
+                                    <tr class="border-b border-gray-100 hover:bg-gray-50 cursor-pointer">
+                                        <td colspan="5" class="py-3 pr-3 text-center text-gray-500">
+                                            Loading...
+                                        </td>
+                                    </tr>
+                                </template>
                                 <template x-for="transaction in transactions">
                                     <tr class="border-b border-gray-100 hover:bg-gray-50 cursor-pointer">
                                         <td @click="showTransaction(transaction)" class="py-3 pr-3 text-left">
@@ -167,7 +174,7 @@
                                         </td>
                                         <td @click="showTransaction(transaction)" class="py-3 pr-3 text-left hidden">NIOS Exam Fee</td>
                                         <td @click="showTransaction(transaction)" class="py-3 pr-3 text-center hidden" x-text="dateData(transaction.created_at)">{{ date('d-M-y') }}</td>
-                                        <td @click="showTransaction(transaction)" class="py-3 pr-3 text-center font-medium text-gray-600" x-text="transaction.amount"></td>
+                                        <td @click="showTransaction(transaction)" class="py-3 pr-3 text-center font-medium text-gray-600" x-text="transaction.amount - transaction.remarks ?? 0"></td>
                                         <td class="py-3 pr-3 text-center font-medium text-gray-600">
                                             <form @submit.prevent="confirm('Are you sure to delete this transaction?') && deleteTransaction($event.target)" method="POST" action="{{ route('transactions.delete') }}">
                                                 @csrf
@@ -286,7 +293,7 @@ x-show="open" @view-transaction.window="show($event.detail)" class="fixed z-10 i
                     @endif
                 </div>
 
-                <div class="flex justify-between">
+                <div class="flex justify-between items-center">
                     <div>Time</div>
                     @if ($user->isAdmin())
                         <input type="datetime-local" :value="dateTimeLocal(transaction.created_at)" class="input mb-0 w-max" name="created_at" id="created_at">
@@ -295,25 +302,27 @@ x-show="open" @view-transaction.window="show($event.detail)" class="fixed z-10 i
                     @endif
                 </div>
 
-                <div class="flex justify-between">
+                <div class="flex justify-between items-center">
                     <div>Category</div>
                     @if ($user->isAdmin())
                         <select class="input mb-0 w-max" name="category_id">
                             <option value="">Select Category</option>
-                            <template x-if="categories">
-                                <template x-for="category in categories">
+                                <template x-for="category in data.categories">
                                     <option :value="category.id" :selected="category.id == transaction.category" x-text="category.name"></option>
                                 </template>
-                            </template>
                         </select>
                     @else
-                    <div class="font-medium capitalize" x-text="(transaction.category ? transaction.category : '') + (transaction.remarks ? ' ( Return )' : '')"></div>
+                    <div class="font-medium capitalize" x-text="transaction.category ? transaction.category : ''"></div>
                     @endif
                 </div>
 
-                <div class="flex justify-between">
+                <div class="flex justify-between items-center">
                     <div>Description</div>
+                    @if ($user->isAdmin())
+                        <textarea name="description" class="input w-max mb-0" cols="30" rows="3" :value="transaction.description"></textarea>
+                    @else
                     <div class="font-medium" x-text="transaction.description"></div>
+                    @endif
                 </div>
             </div>
 
@@ -364,7 +373,8 @@ x-show="open" @view-transaction.window="show($event.detail)" class="fixed z-10 i
             data: {
                 students: [],
                 user: {},
-                transactions: []
+                transactions: [],
+                categories: []
             },
             dataAdded: false,
             transaction: {
@@ -374,11 +384,9 @@ x-show="open" @view-transaction.window="show($event.detail)" class="fixed z-10 i
             show(data) {
                 if (!this.dataAdded) {
                     this.data = JSON.parse(JSON.stringify(data.data));
-                    console.log(this.data);
                     this.dataAdded = true;
                 }
                 this.transaction = data.transaction;
-                this.categories = data.categories;
                 this.open = true;
             },
             close() {
@@ -395,6 +403,7 @@ x-show="open" @view-transaction.window="show($event.detail)" class="fixed z-10 i
         lastTransactionDetails: {
             loading: false,
         },
+        firstLoading: true,
         loadTransactions(more = false, url = '{{ route('ajax') }}') {
             this.lastTransactionDetails.loading = true;
             var formData = new FormData();
@@ -416,7 +425,7 @@ x-show="open" @view-transaction.window="show($event.detail)" class="fixed z-10 i
                 else
                     this.transactions = this.transactions.concat(data.transactions.data);
                 this.lastTransactionDetails = {...data, loading: false};
-                console.log(this.lastTransactionDetails);
+                this.firstLoading = false;
             });
         },
         abortController: false,
@@ -434,7 +443,7 @@ x-show="open" @view-transaction.window="show($event.detail)" class="fixed z-10 i
                 return false;
             }
             this.loading = true;
-            if (searched = this.searchedItems.find(item => item.username == this.ad_no)) {
+            if (searched = this.searchedItems.find(item => item.keyword == this.ad_no)) {
                 this.students = searched.result;
                 this.loading = false;
                 this.student = this.getStudent();
@@ -465,7 +474,11 @@ x-show="open" @view-transaction.window="show($event.detail)" class="fixed z-10 i
                 return json.json();
             }).then(data => {
                 this.students = data.students;
-                this.allStudents = this.addWithoutDuplicates(this.allStudents, this.students);
+                this.searchedItems.push({
+                    keyword: this.ad_no,
+                    result: data.students
+                });
+                this.allStudents = this.addWithoutDuplicates(this.allStudents, this.students, 'username');
                 this.loading = false;
                 this.student = this.getStudent();
             }).catch(err => {
@@ -473,9 +486,10 @@ x-show="open" @view-transaction.window="show($event.detail)" class="fixed z-10 i
                 this.loading = false;
             });
         },
-        addWithoutDuplicates(array, newArray) {
+        addWithoutDuplicates(array, newArray, array_key, newArray_key = null) {
+            newArray_key = newArray_key ?? array_key;
             newArray.forEach(item => {
-                if (!array.find(item2 => item2.username == item.username)) {
+                if (!array.find(item2 => item2[array_key] == item[newArray_key])) {
                     array.push(item);
                 }
             });
@@ -517,11 +531,11 @@ x-show="open" @view-transaction.window="show($event.detail)" class="fixed z-10 i
         userDetails() {
             return this.transactions.reduce((acc, curr) => {
                 if (curr.transaction_type == 'expense') {
-                    acc.deposit += curr.amount;
-                    acc.balance += curr.amount;
+                    acc.deposit += curr.amount - curr.remarks ?? 0;
+                    acc.balance += curr.amount - curr.remarks ?? 0;
                 } else {
-                    acc.expense += curr.amount;
-                    acc.balance -= curr.amount;
+                    acc.expense += curr.amount - curr.remarks ?? 0;
+                    acc.balance -= curr.amount - curr.remarks ?? 0;
                 }
                 return acc;
             }, {

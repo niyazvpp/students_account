@@ -18,7 +18,11 @@ class Transaction extends Model
         'category'
     ];
 
-
+    public function getCalculatedAmount()
+    {
+        $value = $this->amount - $this->remarks ?? 0;
+        return round($value, 2);
+    }
 
     public function getAmountAttribute($value)
     {
