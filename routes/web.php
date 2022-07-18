@@ -26,7 +26,8 @@ Route::get('/', function () {
 })->middleware(['auth']);
 
 Route::get('/dashboard', [TransactionController::class, 'dashboard'])->middleware(['auth'])->name('dashboard');
-
+Route::get('/transactions', [TransactionController::class, 'create'])->name('transact');
+Route::post('ajax', [TransactionController::class, 'ajax'])->middleware(['auth'])->name('ajax');
 require __DIR__.'/auth.php';
 
 // Route::get('checker', function(){
@@ -39,14 +40,9 @@ Route::middleware(['auth', 'user_type:teacher,admin'])->group(function () {
     // Route::get('/users', [UserController::class, 'index'])->name('users');
     // Route::post('/users', [UserController::class, 'store'])->name('addUsers');
 
-    Route::post('ajax', [TransactionController::class, 'ajax'])->name('ajax');
-
-    Route::get('transact', [TransactionController::class, 'create'])->name('transact');
-    Route::post('transact', [TransactionController::class, 'store']);
+    Route::post('transactions', [TransactionController::class, 'store']);
     Route::post('transactions/delete', [TransactionController::class, 'delete'])->name('transactions.delete');
-    Route::get('transactions', [TransactionController::class, 'index'])->name('transactions');
-    Route::get('categories', [CategoryController::class, 'index'])->name('categories');
-    Route::post('categories/edit', [CategoryController::class, 'editCategory'])->name('categories.edit');
+    // Route::get('transactions', [TransactionController::class, 'index'])->name('transactions');
 
 
 
@@ -82,12 +78,16 @@ Route::middleware(['auth', 'user_type:admin'])->group(function () {
     //                     ->name('ajax.students.delete_all');
 
     Route::get('export_backup', [StudentController::class, 'export'])->name('export_backup');
-    // Route::get('artisan', [UserController::class, 'artisan'])
-    //                     ->middleware(['no_ajax', 'password.confirm'])
-    //                     ->name('migrate.refresh');
+    Route::get('artisan', [UserController::class, 'artisan'])
+                        ->middleware(['no_ajax', 'password.confirm'])
+                        ->name('migrate.refresh');
 
     Route::get('classes', [ClassesController::class, 'index'])->name('classes');
     Route::post('classes/edit', [ClassesController::class, 'editClass'])->name('classes.edit');
+
+    // Categories
+    Route::get('categories', [CategoryController::class, 'index'])->name('categories');
+    Route::post('categories/edit', [CategoryController::class, 'editCategory'])->name('categories.edit');
 
     // TEACHERS
     Route::get('/{type}', [UserController::class, 'users'])->name('users');

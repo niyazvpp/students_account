@@ -21,4 +21,9 @@ class Classes extends Model
     {
         return $this->belongsTo(User::class, 'teacher_id', 'id')->where('user_type', 'teacher');
     }
+
+    public function students()
+    {
+        return $this->hasMany(Student::class, 'class_id');
+    }
 }

@@ -45,34 +45,48 @@ class User extends Authenticatable
 
     public function expenses()
     {
-        return $this->hasMany(Transaction::class, 'reciever_id')->with('sender');
+        return $this->hasMany(Transaction::class, 'reciever_id')->with('sender.meta.class');
     }
 
     public function deposits()
     {
-        return $this->hasMany(Transaction::class, 'sender_id')->with('reciever');
+        return $this->hasMany(Transaction::class, 'sender_id')->with('reciever.meta.class');
     }
 
     public function transactions()
     {
-        return Transaction::where('sender_id', $this->id)->orWhere('reciever_id', $this->id)->with('sender', 'reciever')->latest();
+        return Transaction::where(function ($query){
+            $query->where('transactions.sender_id', $this->id)->orWhere('transactions.reciever_id', $this->id);
+        })->with(['sender' => function ($query) {
+            $query->where('id', '<>',$this->id)->with('meta.class');
+        }, 'reciever' => function ($query) {
+            $query->where('id', '<>',$this->id)->with('meta.class');
+        }]);
+
+        // if ($user_only) {
+            // $deposits = Transaction::where('sender_id', $this->id)->with('reciever.meta.class')->latest();
+            // return Transaction::where('reciever_id', $this->id)->with('sender.meta.class')->union($deposits)->latest();
+        // }
+        // return $this->deposits()->union($this->expenses()->getBaseQuery());
+        // return $this->deposits()->union($this->expenses()->getBaseQuery());
+        // return Transaction::where('sender_id', $this->id)->orWhere('reciever_id', $this->id)->with('sender', 'reciever')->latest();
     }
 
     public function getTotalIncomeAttribute()
     {
-        $number = $this->deposits()->sum(DB::raw('if(remarks is not null, amount - remarks, amount)')) ?? 0;
+        $number = ($this->deposits()->sum(DB::raw('if(remarks is not null, amount - remarks, amount)')) ?? 0) + $this->old_balance ?? 0;
         return round($number, 2);
     }
 
     public function getTotalExpensesAttribute()
     {
-        $number = $this->expenses()->sum(DB::raw('if(remarks is not null, amount - remarks, amount)')) ?? 0;
+        $number = ($this->expenses()->sum(DB::raw('if(remarks is not null, amount - remarks, amount)')) ?? 0) + ($this->isAdmin() ? User::sum('old_balance') : 0);
         return round($number, 2);
     }
 
     public function getBalanceAttribute()
     {
-        $number = ($this->old_balance + $this->total_income) - $this->total_expenses;
+        $number = ($this->total_income) - $this->total_expenses;
         return round($number, 2);
     }
 
@@ -87,10 +101,10 @@ class User extends Authenticatable
         return $this->hasOne(Student::class, 'user_id');
     }
 
-    public function students()
-    {
-        return $this->hasMany(Student::class, 'parent_id');
-    }
+    // public function students()
+    // {
+    //     return $this->hasMany(Student::class, 'parent_id');
+    // }
 
     public function is($type)
     {

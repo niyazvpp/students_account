@@ -19,8 +19,8 @@
 	.input {
 		@apply block text-sm focus:shadow-none focus:ring-1 focus:ring-blue-400 appearance-none rounded-xl w-full py-2 px-4 text-gray-700 mb-3 leading-tight focus:outline-none focus:bg-white border border-gray-300 focus:border-blue-400 transition-all duration-200 ease-in-out;
 	}
-    .input[disabled] {
-        @apply bg-gray-100 cursor-not-allowed;
+    .input[disabled], .btn[disabled] {
+        @apply bg-gray-200 cursor-not-allowed;
     }
 	.form-group .input {
 		@apply mb-1;

@@ -7,10 +7,12 @@ use Illuminate\Http\Request;
 use App\Http\Requests\StoreTransactionRequest;
 use App\Http\Requests\UpdateTransactionRequest;
 use App\Models\Category;
+use App\Models\Classes;
 use App\Models\Student;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
@@ -35,52 +37,92 @@ class TransactionController extends Controller
 
                 $transactions = Transaction::with('sender.meta.class', 'reciever.meta.class');
 
-                if (isset($inputs->search)) {
-                    $transactions = $transactions->where('description', 'like', '%' . $inputs->search . '%');
-                }
-
-                if (isset($inputs->category_id)) {
-                    $transactions = $transactions->where('category_id', $inputs->category_id);
-                }
-
                 if ($user->is('student')) {
-                    $transactions = $transactions->where('reciever_id', $user->id)->orWhere('sender_id', $user->id);
+                    if (isset($inputs->type) && in_array($inputs->type, ['expenses', 'deposits'])) {
+                        $transactions = $user->{$inputs->type}();
+                    } else
+                        $transactions = $user->transactions();
+                    // $transactions = $transactions->where('reciever_id', $user->id)->orWhere('sender_id', $user->id);
                 } else {
                     // if input is set, then filter by it
                     if (isset($inputs->user_id)) {
-                        $transactions = $transactions->where('reciever_id', $inputs->user_id)->orWhere('sender_id', $inputs->user_id);
+                        if (isset($inputs->type) && in_array($inputs->type, ['expenses', 'deposits'])) {
+                            $transactions = $inputs->type == 'deposits' ? $user->expenses() : $user->deposits();
+                        } else
+                            $transactions = $user->transactions();
+                        // $transactions = $transactions->where('reciever_id', $inputs->user_id)->orWhere('sender_id', $inputs->user_id);
                     }
 
                     // if two user_ids provided filter by common transactions between both users
                     if (isset($inputs->user_id_1) && isset($inputs->user_id_2)) {
+                        if (in_array($user->id, [$inputs->user_id_1, $inputs->user_id_2])) {
+                            $transactions = $user->transactions();
+                        }
                         $transactions = $transactions->where(function ($query) use ($inputs) {
-                            $query->where('reciever_id', $inputs->user_id_1)->orWhere('reciever_id', $inputs->user_id_2);
+                            $query->where('transactions.reciever_id', $inputs->user_id_1)->orWhere('transactions.reciever_id', $inputs->user_id_2);
                         })->Orwhere(function ($query) use ($inputs) {
-                            $query->where('sender_id', $inputs->user_id_1)->orWhere('sender_id', $inputs->user_id_2);
+                            $query->where('transactions.sender_id', $inputs->user_id_1)->orWhere('transactions.sender_id', $inputs->user_id_2);
                         });
                     }
 
                     // show transactions by classes
                     if (isset($inputs->class_id)) {
-                        $transactions = $transactions->whereHas('sender', function ($query) use ($inputs) {
-                            $query->where('class_id', $inputs->class_id);
-                        })->orWhereHas('reciever', function ($query) use ($inputs) {
-                            $query->where('class_id', $inputs->class_id);
-                        });
+                        $transactions = $transactions
+                                ->leftJoin('users as s', 's.id', '=', 'transactions.sender_id')
+                                ->leftJoin('users as r', 'r.id', '=', 'transactions.reciever_id')
+                                ->leftJoin('students as sm', 'sm.user_id', '=', 's.id')
+                                ->leftJoin('students as rm', 'rm.user_id', '=', 'r.id')
+                                ->where(function($query) use ($inputs) {
+                                    $query->where('sm.class_id', $inputs->class_id)
+                                        ->orWhere('rm.class_id', $inputs->class_id);
+                                });
                     }
+                }
+
+                // if(isset($inputs->user_another)) {
+                //     $transactions = $transactions->where(function ($query) use ($inputs) {
+                //         $query->where('sender_id', $inputs->user_another)->orWhere('reciever_id', $inputs->user_another);
+                //     });
+                // }
+
+                if (!empty($inputs->search)) {
+                    if (!isset($inputs->class_id)) {
+                        $transactions = $transactions->leftJoin('users as s', 's.id', '=', 'transactions.sender_id')
+                                                    ->leftJoin('users as r', 'r.id', '=', 'transactions.reciever_id');
+                    }
+                    $transactions = $transactions->where(function ($query) use ($inputs) {
+                                            $query->where('transactions.description', 'like', '%' . $inputs->search . '%')
+                                                ->orWhere('transactions.amount', 'like', '%' . $inputs->search . '%')
+                                                ->orWhere('transactions.remarks', 'like', '%' . $inputs->search . '%')
+                                                ->orWhere('s.name', 'like', '%' . $inputs->search . '%')
+                                                ->orWhere('r.name', 'like', '%' . $inputs->search . '%')
+                                                ->orWhere('s.username', 'like', '%' . $inputs->search . '%')
+                                                ->orWhere('r.username', 'like', '%' . $inputs->search . '%')
+                                                ->orWhere('transactions.created_at', 'like', '%' . $inputs->search . '%');
+                                        });
+                 }
+
+                if (isset($inputs->category_id)) {
+                    $transactions = $transactions->where('transactions.category_id', $inputs->category_id);
                 }
 
                 // show only transactions on a date range
                 if (isset($inputs->date_from) && isset($inputs->date_to)) {
-                    $transactions = $transactions->whereBetween('created_at', [$inputs->date_from, $inputs->date_to]);
+                    $transactions = $transactions->whereBetween('transactions.created_at', [$inputs->date_from, $inputs->date_to]);
                 }
 
                 // show only transactions on a date
                 if (isset($inputs->date)) {
-                    $transactions = $transactions->where('created_at', 'like', $inputs->date . '%');
+                    $transactions = $transactions->where('transactions.created_at', 'like', $inputs->date . '%');
                 }
 
-                $transactions = $transactions->orderBy('created_at', 'desc');
+                $transactions = $transactions->orderBy('transactions.created_at', 'desc')->select('transactions.*');
+                // $query = $transactions;
+                // $bindings = $query->getBindings();
+
+                // $query = preg_replace_callback('/\?/', function ($match) use (&$bindings, $query) {
+                //     return $query->getConnection()->getPdo()->quote(array_shift($bindings));
+                // }, $query->toSql());
                 if (!$user->isAdmin() || !isset($inputs->export)) {
                     $transactions = $transactions->paginate($inputs->limit ?? 25);
                 } else {
@@ -98,7 +140,9 @@ class TransactionController extends Controller
                     return response()->json(['error' => 'Invalid action'], 422);
                 }
 
-                $students = User::with('meta.class')->where('user_type', 'student');
+                $students = User::with('meta.class');
+                if(!$user->isAdmin())
+                    $students = $students->where('user_type', 'student');
                 if (isset($inputs->search)) {
                     $students = $students->where(function ($query) use ($inputs) {
                             $query->where('name', 'like', '%' . $inputs->search . '%')
@@ -165,32 +209,20 @@ class TransactionController extends Controller
         return view('dashboard', ['header' => 'Dashboard', 'user' => $user, 'desc' => 'You can view all the primary data here']);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create(Request $request)
     {
-        if ($request->user()->user_type != 'admin' && $request->user()->user_type != 'teacher') {
-            abort(404);
+        $categories = Category::all();
+        $classes = [];
+        $make = 'Filter';
+        if (!$request->user()->is('student')) {
+            $classes = Classes::withCount('students')->get();
+            $make = 'Make';
         }
-        $user = $request->user();
-        $transactions = $user->transactions();
-        $categories = [];
-        if (!$user->is('student')) {
-            $categories = Category::all();
-        }
-        $students = User::with('meta.class')->where('user_type', 'student')->get();
-        return view('transact', ['header' => 'Transact', 'desc' => 'Add or Edit Transactions', 'categories' => $categories, 'students' => $students, 'transactions' => $transactions, 'user' => $user]);
+        $user = $request->user()->load('meta.class');
+        return view('transact', ['header' => 'Transactions', 'desc' => 'View and ' . $make . ' Transactions', 'categories' => $categories, 'user' => $user, 'classes' => $classes]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \App\Http\Requests\StoreTransactionRequest  $request
-     * @return \Illuminate\Http\Response
-     */
+
     public function store(StoreTransactionRequest $request)
     {
         $user = $request->user();
@@ -199,18 +231,53 @@ class TransactionController extends Controller
             $category_new = (new CategoryController)->insertCategory($request->merge(['name' => $request->category_name]));
              $category_id = $category_new->id;
         }
+        $ids =  $request->ids ? explode(',', $request->ids) : [];
+        if ( !$request->exclude && (!count($ids) || User::whereIn('id', $ids)->count() != count($ids) || in_array($user->id, $ids))) {
+            return response()->json(['error' => 'Invalid users'], 422);
+        }
+        if ($request->exclude) {
+            $ids = count($ids) ? User::whereNotIn('id', $ids) : new User;
+            if ($request->class_id) {
+                $ids = $ids->whereHas('meta', function ($query) use ($request) {
+                    $query->where('class_id', $request->class_id);
+                });
+            }
+            $ids = $ids->where('user_type', 'student')->pluck('id')->toArray();
+        }
+        $extra = 0;
+        $amount = $request->amount ?? 0;
+        if ($request->transaction_type == 'expense' && $request->divide) {
+            $new_amount = ceil($request->amount / count($ids));
+            $extra = ($new_amount * count($ids)) - $request->amount;
+            $amount = $new_amount;
+        }
+        $data = [];
+        foreach ($ids as $id) {
+            $add = array_merge($request->except(['reciever_id', 'sender_id', 'updated_by', 'created_at', 'updated_at', 'remarks']), ['created_by' => $request->user()->id, ($request->transaction_type == 'expense' ? 'reciever_id' : 'sender_id') => $id, 'category_id' => $category_id, 'amount' => $amount]);
+            $data[] = $add;
+        }
         if ($request->transaction_type == 'expense') {
-            $transaction = $user->deposits()->create(
-                array_merge($request->except(['reciever_id', 'sender_id', 'updated_by', 'created_at', 'updated_at']), ['created_by' => $request->user()->id, 'reciever_id' => $request->other_id, 'category_id' => $category_id])
-            );
+            $transactions = $user->deposits()->createMany($data);
         }
         else {
-            $transaction = $user->expenses()->create(
-                array_merge($request->except(['reciever_id', 'sender_id', 'updated_by', 'created_at', 'updated_at']), ['created_by' => $request->user()->id, 'sender_id' => $request->other_id, 'category_id' => $category_id])
-            );
+            $transactions = $user->expenses()->createMany($data);
         }
-        $transaction->load('sender.meta.class', 'reciever.meta.class');
-        return response()->json(['message' => 'Transaction Created Successfully', 'status' => 'success', 'transaction' => $transaction, 'category' => $category_new], 201);
+        if ($extra) {
+            $librarian = User::where('username', 'librarian')->first();
+            if ($librarian) {
+                $library_transaction = $librarian->expenses()->create([
+                    'amount' => $extra,
+                    'category_id' => $category_id,
+                    'created_by' => $request->user()->id,
+                    'sender_id' => $librarian->id,
+                    'reciever_id' => $user->id,
+                    'description' => 'Extra amount for transaction ' . $transactions[0]->id
+                ]);
+                $transactions[] = $library_transaction;
+            }
+        }
+        // $transactions->load('sender.meta.class', 'reciever.meta.class');
+        return response()->json(['message' => 'Transaction Created Successfully', 'status' => 'success', 'category' => $category_new], 201);
     }
 
     public function ajaxTransactions(Request $request)
@@ -229,7 +296,7 @@ class TransactionController extends Controller
             $validator = Validator::make((array) $transaction, [
                 'amount' => 'required|numeric|min:0.5|max:25000',
                 'category_name' => 'required|min:4|max:50',
-                'description' => 'nullable|max:255|min:4',
+                'description' => 'nullable|max:255',
                 'remarks' => 'nullable|numeric|exists:transactions,id',
                 'ad_no' => 'required',
                 'transaction_type' => 'required|in:expense,deposit',
@@ -285,7 +352,14 @@ class TransactionController extends Controller
     public function update(UpdateTransactionRequest $request)
     {
         $transaction = Transaction::findOrFail($request->id);
-        $transaction->update(array_merge($request->all(), ['updated_by' => $request->user()->id]));
+        $values = [
+            'amount' => $request->amount ?? $transaction->amount,
+            'category_id' => $request->category_id ?? $transaction->category_id,
+            'description' => $request->description ?? $transaction->description,
+            'remarks' => $request->remarks ?? $transaction->remarks,
+            'created_at' => Carbon::parse($request->created_at ?? $transaction->created_at)->timestamp,
+        ];
+        $transaction->update(array_merge($values, ['updated_by' => $request->user()->id]));
         return response()->json(['message' => 'Transaction Updated Successfully', 'status' => 'success', 'transaction' => $transaction], 200);
     }
 

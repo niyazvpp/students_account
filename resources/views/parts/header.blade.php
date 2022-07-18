@@ -40,8 +40,8 @@
 			<svg class="h-11 w-11" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" enable-background="new 0 0 128 128" version="1.1" viewBox="0 0 128 128" xml:space="preserve"><circle cx="64" cy="64" fill="#4B5F83" r="64"/><g><path d="M64,99h35c0-16-10.4-29-24.6-33.4C80.1,62,84,55.7,84,48.5c0-11-9-20-20-20" fill="#E6E6E6" /><path d="M64,28.5c-11,0-20,9-20,20c0,7.2,3.9,13.6,9.6,17.1C39.4,70,29,83,29,99h35" fill="#FFFFFF"/></g></svg>
 		</div>
 		<div class="hidden sm:block text-left ml-2">
-			<div class="text-gray-700 font-medium text-sm">Admin</div>
-			<div class="text-gray-300 font-light text-sm">Admin Account</div>
+			<div class="text-gray-700 font-medium text-sm">{{ $user->name }}</div>
+			<div class="text-gray-300 font-light capitalize text-sm">{{ $user->user_type ?? 'Student' }} Account</div>
 		</div>
 	</div>
 </div>

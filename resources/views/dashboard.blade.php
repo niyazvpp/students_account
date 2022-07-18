@@ -9,32 +9,31 @@
 
         <div class="sm:grid sm:grid-cols-2 px-4 sm:px-0">
             <div class="btn my-4 sm:my-0 flex justify-center flex-col sm:rounded-r-none bg-blue-400">
-                <div class="text-2xl font-medium">₹ {{ $user->balance }}</div>
+                <div class="text-2xl font-medium">₹ {{ $user->is('student') || $user->balance == 0 ? $user->balance : -($user->balance) }}</div>
                 <div class="text-sm font-normal">Balance</div>
             </div>
             <div>
                 <div class="btn py-2 my-4 sm:my-0 flex justify-center flex-col sm:rounded-b-none sm:rounded-l-none bg-green-400">
-                    <div class="text-xl font-medium">₹ {{ $user->total_income }}</div>
-                        <div class="text-sm font-normal">Deposit</div>
+                    <div class="text-xl font-medium">₹ {{ $user->is('student') ? $user->total_income : $user->total_expenses }}</div>
+                        <div class="text-sm font-normal">{{ !$user->is('student') ? 'You Recieved' : 'Deposit' }}</div>
                     </div>
                 <div class="btn py-2 my-4 sm:my-0 flex justify-center flex-col sm:rounded-t-none sm:rounded-l-none bg-red-400">
-                    <div class="text-xl font-medium">₹ {{ $user->total_expenses }}</div>
-                        <div class="text-sm font-normal">Expense</div>
+                    <div class="text-xl font-medium">₹ {{ !$user->is('student') ? $user->total_income : $user->total_expenses }}</div>
+                        <div class="text-sm font-normal">{{ !$user->is('student') ? 'You Spent' : 'Expense' }}</div>
                     </div>
                 </div>
             </div>
         </div>
 
-        @if (auth()->user()->is('teacher') || auth()->user()->is('admin'))
+
         <a href="{{ route('transact') }}">
             <div class="underline text-blue-400 hover:text-blue-500 text-center mt-12">
-                Start Transactions
+                {{ auth()->user()->is('teacher') || auth()->user()->is('admin') ? 'Start' : 'View' }} Transactions
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
             </div>
         </a>
-        @endif
     </div>
 
 
@@ -370,14 +369,15 @@
                         if(row.length > 0){
                             let columns = row.split('\t');
                             console.log(columns, columns.length);
-                            if (columns[0] == '' || columns[1] == '' || columns[4] == '' || (columns[5] == '' && columns[6] == ''))
+                            if (columns[0] == '' || columns[1] == '' || columns[2] == '' || (columns[4] == '' && columns[5] == ''))
                                 return false;
                             let transaction = {
                                 date: columns[0],
                                 ad_no: columns[1],
-                                category_name: columns[4],
-                                transaction_type: columns[5] == '' ? 'expense' : 'deposit',
-                                amount: columns[5] == '' ? columns[6] : columns[5],
+                                category_name: columns[2],
+                                description: columns[3],
+                                transaction_type: columns[4] == '' ? 'expense' : 'deposit',
+                                amount: columns[4] == '' ? columns[5] : columns[4],
                             };
                             returnData.push(transaction);
                         }

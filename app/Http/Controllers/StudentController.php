@@ -13,6 +13,7 @@ use Carbon\Carbon;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -34,8 +35,8 @@ class StudentController extends Controller
         ])->validate();
         $inputs = $data->inputs;
 
-        switch ($data->action) {
-            case 'students':
+        // switch ($data->action) {
+        //     case 'students':
     }
 
 
@@ -181,57 +182,59 @@ class StudentController extends Controller
             return $student['username'];
         }, $uniques->toArray());
 
-        foreach (json_decode($request->students) as $key => $student) {
+        DB::transaction(function() use ($request, &$count, &$errors, &$upserts, &$upserts_students, &$ad_nos, &$uniques) {
+            foreach (json_decode($request->students) as $key => $student) {
 
-            $validator = Validator::make((array) $student, [
-                'name' => 'required|min:2|max:255',
-                'old_balance' => 'nullable|numeric',
-                'ad_no' => 'required|min:2',
-                'class_id' => 'required|exists:classes,id',
-            ]);
+                $validator = Validator::make((array) $student, [
+                    'name' => 'required|min:2|max:255',
+                    'old_balance' => 'nullable|numeric',
+                    'ad_no' => 'required|min:2',
+                    'class_id' => 'required|exists:classes,id',
+                ]);
 
-            if ($validator->fails()) {
-                $errors[$student->ad_no] = $validator->errors();
-                continue;
-            }
+                if ($validator->fails()) {
+                    $errors[$student->ad_no] = $validator->errors();
+                    continue;
+                }
 
-            $count++;
+                $count++;
 
-            if (in_array($student->ad_no, $ad_nos)) {
-                $upserts[] = [
+                if (in_array($student->ad_no, $ad_nos)) {
+                    $upserts[] = [
+                        'name' => $student->name,
+                        'username' => $student->ad_no,
+                        'old_balance' => $student->old_balance,
+                        'password' => Hash::make('student' . $student->ad_no),
+                        'user_type' => 'student',
+                    ];
+
+                    $upserts_students[] = [
+                        'user_id' => $uniques->firstWhere('username', $student->ad_no)->id,
+                        'class_id' => $student->class_id,
+                        'ad_no' => $student->ad_no,
+                        'dob' => $student->dob ? Carbon::parse($student->dob) : null,
+                    ];
+                    continue;
+                }
+
+                $user = User::create([
                     'name' => $student->name,
                     'username' => $student->ad_no,
                     'old_balance' => $student->old_balance,
                     'password' => Hash::make('student' . $student->ad_no),
                     'user_type' => 'student',
-                ];
+                ]);
 
-                $upserts_students[] = [
-                    'user_id' => $uniques->firstWhere('username', $student->ad_no)->id,
+                event(new Registered($user));
+
+                Student::create([
+                    'user_id' => $user->id,
                     'class_id' => $student->class_id,
                     'ad_no' => $student->ad_no,
                     'dob' => $student->dob ? Carbon::parse($student->dob) : null,
-                ];
-                continue;
+                ]);
             }
-
-            $user = User::create([
-                'name' => $student->name,
-                'username' => $student->ad_no,
-                'old_balance' => $student->old_balance,
-                'password' => Hash::make('student' . $student->ad_no),
-                'user_type' => 'student',
-            ]);
-
-            event(new Registered($user));
-
-            Student::create([
-                'user_id' => $user->id,
-                'class_id' => $student->class_id,
-                'ad_no' => $student->ad_no,
-                'dob' => $student->dob ? Carbon::parse($student->dob) : null,
-            ]);
-        }
+        });
 
         if (!$count) {
             return response()->json([

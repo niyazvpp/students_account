@@ -13,7 +13,7 @@ class UpdateTransactionRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -24,10 +24,10 @@ class UpdateTransactionRequest extends FormRequest
     public function rules()
     {
         $rules = [
-            'amount' => 'required|numeric|min:0.5|max:25000',
-            'category_id' => 'required|exists:categories,id',
+            'amount' => 'nullable|numeric|min:0.5|max:25000',
+            'category_id' => 'nullable|exists:categories,id',
             'description' => 'nullable|max:255|min:4',
-            'created_at' => 'nullable|datetime',
+            'created_at' => 'nullable|date',
             'remarks' => 'nullable|numeric|min:0|lte:amount',
         ];
         return $rules;

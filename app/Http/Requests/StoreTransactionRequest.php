@@ -28,10 +28,13 @@ class StoreTransactionRequest extends FormRequest
             'category_id' => 'required',
             'description' => 'nullable|max:255|min:4',
             'remarks' => 'nullable|numeric|min:0|lte:amount',
-            'other_id' => 'required|exists:users,id|notIn:' . auth()->id(),
+            'ids' => 'requiredUnless:exclude,1',
+            'exclude' => 'nullable|in:1',
+            'divide' => 'nullable|in:1',
+            'class_id' => 'nullable|exists:classes,id',
             'transaction_type' => 'required|in:expense,deposit',
         ];
-        if ($this->category_id != 0) {
+        if ($this->category_id != 0 || !auth()->user()->isAdmin()) {
             $rules['category_id'] = 'required|exists:categories,id';
         }
         return $rules;
