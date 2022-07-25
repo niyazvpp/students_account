@@ -127,6 +127,12 @@
                                 </div>
 
                                     <div class="form-group">
+                                        <label for="description" class="label">Description: (Optional)</label>
+                                        <textarea name="description" id="description" class="input bg-white"></textarea>
+                                        <small class="text-red-500 error"></small>
+                                    </div>
+
+                                    <div class="form-group">
                                         <label for="amount" class="label">Amount:</label>
                                         <input required @input="advanced_amount = ($event.target.value ?? 0)" x-ref="amount_value" step=".01" name="amount" id="amount" type="number" class="input py-4 text-xl bg-white">
                                         <small class="text-red-500 error"></small>
@@ -138,16 +144,16 @@
                                     </div>
 
                                     <div x-show="show_advanced && advanced_fields.divide" class="form-group sm:col-span-9">
-                                        <label for="applicable_amount" class="label">Applicable Amount:</label>
+                                        <label for="applicable_amount" class="label">Applicable To Each:</label>
                                         <input name="applicable_amount" id="applicable_amount" disabled :value="advanced_applicable_amount()" type="text" class="input bg-gray-200">
                                         <small class="text-red-500 error"></small>
                                     </div>
 
-                                        <div class="form-group">
-                                            <label for="description" class="label">Description: (Optional)</label>
-                                            <textarea name="description" id="description" class="input bg-white"></textarea>
-                                            <small class="text-red-500 error"></small>
-                                        </div>
+                                    <div class="form-group">
+                                        <label for="total_amount" class="label ">Total Amount:</label>
+                                        <input x-ref="total_amount" step=".01" name="total_amount" disabled :value="advanced_total_amount()" id="total_amount" type="number" class="input py-4 text-xl bg-white">
+                                        <small class="text-red-500 error"></small>
+                                    </div>
 
                                     <div class="form-group mt-4">
                                         <button type="submit" class="btn btn-blue w-full flex items-center justify-center" :class="{ 'opacity-60': loading }" :disabled="loading">
@@ -170,7 +176,7 @@
                             <div class="bg-white form-container px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                                   <input type="hidden" name="other_id" :value="student2.id">
                                   <h3 class="text-lg leading-6 mb-4 font-semibold text-gray-900 capitalize flex justify-between"><div>Search {{ !$user->isAdmin() ? 'Student' : 'User' }}</div> <button @click.prevent="filters_show2 = !filters_show2" class="text-sm font-medium text-gray-600 flex items-center btn bg-gray-100 ring-2 ring-gray-200">
-                                        <svg x-show="filters_show3" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <svg x-show="filters_show2" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
                                         </svg>
                                         <svg x-show="!filters_show2" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -193,14 +199,14 @@
                                     </div>
 
                                   {{-- <div class="sm:grid sm:grid-cols-2"> --}}
-                                    <form class="block">
+                                    <form @submit.prevent="" class="block">
                                         <div class="form-group">
                                             <label for="ad_no2" class="label">Search {{ !$user->isAdmin() ? 'Student' : 'User' }}</label>
                                             <input @input.debounce="ad_no2 = trimAndLowerCaseIfString($event.target.value); stop2 = false; searchStudents2()" :value="ad_no2" name="ad_no2" id="ad_no2" type="text" class="input">
-                                            <div x-show="ad_no2 && !stop2 && !student2.name" class="shadow-lg py-1 bg-white z-20 absolute border right-3 left-2 rounded-lg">
+                                            <div x-show="ad_no2 && !stop2 && !student2.name" class="shadow-lg py-1 bg-white z-20 absolute border right-6 left-6 rounded-lg">
                                                 <ul>
                                                 <template x-for="(result, i) in students2">
-                                                    <li @click.prevent="()=> {if(result.id != student2.id) student2 = result}" :class="{ 'bg-gray-100 cursor-not-allowed text-gray-400': result.id == student2.id }" class="border-b flex cursor-pointer px-2 py-1 hover:bg-gray-100 text-sm">
+                                                    <li @click.prevent="()=> {if(result.id != student2.id) { student2 = result; transaction_settings.search_user = result.id; loadTransactions(); ad_no2 = ''; }}" :class="{ 'bg-gray-100 cursor-not-allowed text-gray-400': result.id == student2.id }" class="border-b flex cursor-pointer px-2 py-1 hover:bg-gray-100 text-sm">
                                                         <svg x-show="result.id == student2.id" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                         </svg>
@@ -208,15 +214,49 @@
                                                     </li>
                                                 </template>
                                                 <template x-if="!students2.length">
-                                                    <li class="px-2 py-1 text-sm" x-text="loading ? 'Searching...' : 'No Result Found!'"></li>
+                                                    <li class="px-2 py-1 text-sm" x-text="loading3 ? 'Searching...' : 'No Result Found!'"></li>
                                                 </template>
                                                 </ul>
                                             </div>
                                         </div>
                                     </form>
-                                    <div class="mt-2">
-                                        <div x-text="student2.name"></div>
-                                    </div>
+
+                                    <template x-if="student2.name">
+                                        <div class="space-y-4 py-4 text-gray-600">
+                                            <div class="flex justify-between">
+                                                <div>Name</div>
+                                                <div class="font-medium capitalize" x-text="student2.name"></div>
+                                            </div>
+
+                                            <div class="flex justify-between">
+                                                <div x-text="student2.user_type == 'student' ? 'Ad No.' : 'Username'">Username</div>
+                                                <div class="font-medium" x-text="student2.username"></div>
+                                            </div>
+
+                                            <div x-show="student2.user_type == 'student'" class="flex justify-between">
+                                                <div>Class</div>
+                                                <div class="font-medium capitalize" x-text="student2.meta && student2.meta.class ? student2.meta.class.name : 'N/A'"></div>
+                                            </div>
+
+                                            <!-- Expenses and Deposits -->
+                                            <div class="flex justify-between">
+                                                <div x-text="student2.user_type == 'student' ? 'Expenses' : 'Recieved'">Expenses</div>
+                                                <div class="font-medium capitalize" x-text="(student2.user_type != 'student' ? student2.total_income : student2.total_expenses) + '₹'"></div>
+                                            </div>
+
+                                            <div class="flex justify-between">
+                                                <div x-text="student2.user_type == 'student' ? 'Deposits' : 'Spent'">Deposits</div>
+                                                <div class="font-medium capitalize" x-text="(student2.user_type == 'student' ? student2.total_income : student2.total_expenses) + '₹'"></div>
+                                            </div>
+
+                                            <div class="flex justify-between font-semibold">
+                                                <div>Balance <span x-text="student2.user_type == 'student' ? '' : 'in Hand'"></span></div>
+                                                <div class="capitalize" x-text="(student2.user_type == 'student' ? student2.balance : -(student2.balance)) + '₹'"></div>
+                                            </div>
+                                        </div>
+                                    </template>
+
+
                               </div>
                         </template>
 
@@ -285,6 +325,15 @@
                                 </select>
                             </div>
                         </div>
+
+                        <template x-if="student2.id">
+                            <div class="inline-flex items-center text-gray-600 mb-2 text-sm rounded mt-2 mr-1">
+                                <span class="font-medium text-lg">Showing Transactions of:</span><span class="ml-2 mr-1 font-medium leading-relaxed" x-html="(student2.user_type == 'student' ? student2.username + ' ' : '') + student2.name + (student2.user_type == 'student' ? (student2.meta && student2.meta.class ? ' ' + student2.meta.class.name : '') : '')"></span>
+                                <button type="button" @click.prevent="student2 = false; delete transaction_settings.search_user; loadTransactions()" class="w-6 h-8 flex items-center text-red-500 hover:text-red-600 focus:outline-none">
+                                    <svg class="ml-1 w-6 h-6 fill-current block" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M15.78 14.36a1 1 0 0 1-1.42 1.42l-2.82-2.83-2.83 2.83a1 1 0 1 1-1.42-1.42l2.83-2.82L7.3 8.7a1 1 0 0 1 1.42-1.42l2.83 2.83 2.82-2.83a1 1 0 0 1 1.42 1.42l-2.83 2.83 2.83 2.82z"/></svg>
+                                </button>
+                            </div>
+                        </template>
                         <table class="w-full max-w-full table-fixed">
                             <thead>
                                 <tr class="text-white py-4 bg-blue-500 font-light text-sm">
@@ -674,10 +723,20 @@ x-show="open" @view-transaction.window="show($event.detail)" class="fixed z-10 i
             var amount;
             if (!this.advanced_fields.divide || !(amount = this.advanced_amount)) return 0;
             var students_count = this.advanced_fields.class_id ? this.classes.find(c => c.id == this.advanced_fields.class_id).students_count : this.classes.reduce((sum, class_) => { return sum + (class_.students_count ?? 0);}, 0);
-            var tagged_students = this.tags.map(tag => this.allStudents.find(s => s.id == tag)).filter(o => o && o.meta && o.meta.class && (!this.advanced_fields.class_id || o.meta.class.id == this.advanced_fields.class_id));
+            var tagged_students = this.tags.map(tag => this.allStudents.find(s => s.id == tag)).filter(o => (o && o.meta && o.meta.class && o.meta.class.id == this.advanced_fields.class_id) || !this.advanced_fields.class_id);
             students_count = students_count - tagged_students.length;
             if (!this.advanced_fields.exclude) students_count = tagged_students.length;
+            if (!students_count) return 0;
             return `${amount}/${students_count} = ` + amount / students_count;
+        },
+        advanced_total_amount() {
+            var amount;
+            if (!(amount = this.advanced_amount)) return 0;
+            var students_count = this.advanced_fields.class_id ? this.classes.find(c => c.id == this.advanced_fields.class_id).students_count : this.classes.reduce((sum, class_) => { return sum + (class_.students_count ?? 0);}, 0);
+            var tagged_students = this.tags.map(tag => this.allStudents.find(s => s.id == tag)).filter(o => (o && o.meta && o.meta.class && o.meta.class.id == this.advanced_fields.class_id) || !this.advanced_fields.class_id);
+            students_count = students_count - tagged_students.length;
+            if (!this.advanced_fields.exclude) students_count = tagged_students.length;
+            return amount * students_count;
         },
         advanced_fields: {
             exclude: null,
@@ -883,7 +942,7 @@ x-show="open" @view-transaction.window="show($event.detail)" class="fixed z-10 i
         },
         abortController2: false,
         ad_no2: '',
-        loading2: false,
+        loading3: false,
         students2: [],
         student2: {
             meta: {
@@ -906,9 +965,10 @@ x-show="open" @view-transaction.window="show($event.detail)" class="fixed z-10 i
             if (!load) return false;
             this.searchedItems = [];
             this.searchStudents2();
+            this.loadTransactions();
         },
         searchStudents2(url = '{{ route('ajax') }}') {
-            this.loading2 = false;
+            this.loading3 = false;
             var searched;
             this.student2 = {
                 meta: {
@@ -920,13 +980,13 @@ x-show="open" @view-transaction.window="show($event.detail)" class="fixed z-10 i
             if (this.trimAndLowerCaseIfString(this.ad_no2) == '') {
                 return false;
             }
-            this.loading2 = true;
+            this.loading3 = true;
             if (this.abortController2) {
                 this.abortController2.abort();
             }
             if (searched = this.searchedItems.find(item => item.keyword == this.ad_no2)) {
                 this.students2 = searched.result;
-                this.loading2 = false;
+                this.loading3 = false;
                 // this.student = this.getStudent();
                 return;
             }
@@ -966,10 +1026,10 @@ x-show="open" @view-transaction.window="show($event.detail)" class="fixed z-10 i
                         data: 'Error Loading Students. Please try again!',
                     });
                 }
-                this.loading2 = false;
+                this.loading3 = false;
                 // this.student = this.getStudent();
             }).catch(err => {
-                this.loading2 = false;
+                this.loading3 = false;
                 if (err instanceof DOMException && err.name === 'AbortError') {
                     return;
                 }

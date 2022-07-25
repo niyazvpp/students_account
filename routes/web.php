@@ -26,7 +26,7 @@ Route::get('/', function () {
 })->middleware(['auth']);
 
 Route::get('/dashboard', [TransactionController::class, 'dashboard'])->middleware(['auth'])->name('dashboard');
-Route::get('/transactions', [TransactionController::class, 'create'])->name('transact');
+Route::get('/transactions', [TransactionController::class, 'create'])->middleware(['auth'])->name('transact');
 Route::post('ajax', [TransactionController::class, 'ajax'])->middleware(['auth'])->name('ajax');
 require __DIR__.'/auth.php';
 

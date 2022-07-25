@@ -13,6 +13,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
@@ -51,6 +52,19 @@ class TransactionController extends Controller
                         } else
                             $transactions = $user->transactions();
                         // $transactions = $transactions->where('reciever_id', $inputs->user_id)->orWhere('sender_id', $inputs->user_id);
+                    }
+
+                    if (isset($inputs->search_user)) {
+                        // check if input has type and if it is 'expenses' or 'deposits' and filter by it using when function
+                        $transaction_type = isset($inputs->type) && in_array($inputs->type, ['expenses', 'deposits']) ? $inputs->type : false;
+                        // check if transaction_type is true and if it is 'expenses' or 'deposits' and filter by it using when function
+                        $transactions = $transaction_type ? $transactions->when($transaction_type == 'deposits', function ($query) use ($user) {
+                            return $query->where('sender_id', $user->id);
+                        })->when($transaction_type == 'expenses', function ($query) use ($user) {
+                            return $query->where('reciever_id', $user->id);
+                        }) : $transactions->where(function ($query) use ($inputs) {
+                            $query->where('sender_id', $inputs->search_user)->orWhere('reciever_id', $inputs->search_user);
+                        });
                     }
 
                     // if two user_ids provided filter by common transactions between both users
@@ -264,17 +278,24 @@ class TransactionController extends Controller
         }
         if ($extra) {
             $librarian = User::where('username', 'librarian')->first();
-            if ($librarian) {
-                $library_transaction = $librarian->expenses()->create([
-                    'amount' => $extra,
-                    'category_id' => $category_id,
-                    'created_by' => $request->user()->id,
-                    'sender_id' => $librarian->id,
-                    'reciever_id' => $user->id,
-                    'description' => 'Extra amount for transaction ' . $transactions[0]->id
+            if (!$librarian) {
+                $librarian = User::create([
+                    'name' => 'Librarian',
+                    'username' => 'librarian',
+                    'email' => 'librarian@darulhasanath.com',
+                    'password' => Hash::make('librarian@dhic.com5784'),
+                    'user_type' => 'teacher',
                 ]);
-                $transactions[] = $library_transaction;
             }
+            $library_transaction = $librarian->expenses()->create([
+                'amount' => $extra,
+                'category_id' => $category_id,
+                'created_by' => $request->user()->id,
+                'sender_id' => $librarian->id,
+                'reciever_id' => $user->id,
+                'description' => 'Extra amount for transaction ' . $transactions[0]->id
+            ]);
+            $transactions[] = $library_transaction;
         }
         // $transactions->load('sender.meta.class', 'reciever.meta.class');
         return response()->json(['message' => 'Transaction Created Successfully', 'status' => 'success', 'category' => $category_new], 201);

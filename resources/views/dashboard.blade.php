@@ -10,7 +10,7 @@
         <div class="sm:grid sm:grid-cols-2 px-4 sm:px-0">
             <div class="btn my-4 sm:my-0 flex justify-center flex-col sm:rounded-r-none bg-blue-400">
                 <div class="text-2xl font-medium">₹ {{ $user->is('student') || $user->balance == 0 ? $user->balance : -($user->balance) }}</div>
-                <div class="text-sm font-normal">Balance</div>
+                <div class="text-sm font-normal">Balance {{ !$user->is('student') ? 'in Hand' : '' }}</div>
             </div>
             <div>
                 <div class="btn py-2 my-4 sm:my-0 flex justify-center flex-col sm:rounded-b-none sm:rounded-l-none bg-green-400">

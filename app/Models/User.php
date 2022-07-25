@@ -40,7 +40,7 @@ class User extends Authenticatable
     ];
 
     protected $appends = [
-        'balance',
+        'balance', 'total_income', 'total_expenses',
     ];
 
     public function expenses()
