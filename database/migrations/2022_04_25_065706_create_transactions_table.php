@@ -22,7 +22,7 @@ class CreateTransactionsTable extends Migration
             $table->foreignId('updated_by')->nullable();
             $table->foreignId('category_id')->nullable();
             $table->string('description')->nullable();
-            $table->string('remarks')->nullable();
+            $table->decimal('remarks', 13, 4);
             $table->softDeletes();
             $table->timestamps();
         });

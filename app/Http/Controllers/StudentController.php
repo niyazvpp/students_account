@@ -68,23 +68,6 @@ class StudentController extends Controller
 
         return back()->with([ 'message' => "$c new parent(s) generated", 'type' => 'success' ]);
     }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \App\Http\Requests\StoreStudentRequest  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(StoreStudentRequest $request)
     {
         $request->validate([
@@ -98,51 +81,6 @@ class StudentController extends Controller
         $request->put('password', Hash::make($request->password));
         $request->put('user_type', 'student');
         return User::create($request->all());
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Student  $student
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Student $student)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Student  $student
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Student $student)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \App\Http\Requests\UpdateStudentRequest  $request
-     * @param  \App\Models\Student  $student
-     * @return \Illuminate\Http\Response
-     */
-    public function update(UpdateStudentRequest $request, Student $student)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Student  $student
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Student $student)
-    {
-        //
     }
 
     public function truncate(Request $request)
@@ -188,6 +126,7 @@ class StudentController extends Controller
                 $validator = Validator::make((array) $student, [
                     'name' => 'required|min:2|max:255',
                     'old_balance' => 'nullable|numeric',
+                    'batch_id' => 'nullable|string|in:a',
                     'ad_no' => 'required|min:2',
                     'class_id' => 'required|exists:classes,id',
                 ]);
@@ -201,9 +140,163 @@ class StudentController extends Controller
 
                 if (in_array($student->ad_no, $ad_nos)) {
                     $upserts[] = [
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    
                         'name' => $student->name,
                         'username' => $student->ad_no,
-                        'old_balance' => $student->old_balance,
+                        'old_balance' => $student->old_balance ?? 0,
                         'password' => Hash::make('student' . $student->ad_no),
                         'user_type' => 'student',
                     ];
@@ -211,6 +304,7 @@ class StudentController extends Controller
                     $upserts_students[] = [
                         'user_id' => $uniques->firstWhere('username', $student->ad_no)->id,
                         'class_id' => $student->class_id,
+                        'batch_id' => $student->batch_id ?? null,
                         'ad_no' => $student->ad_no,
                         'dob' => $student->dob ? Carbon::parse($student->dob) : null,
                     ];

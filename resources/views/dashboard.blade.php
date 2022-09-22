@@ -365,12 +365,15 @@
                 },
                 calculated(data){
                     let returnData = [];
+                    var count = 0;
+                    var limit = 250;
                     data.split('\n').forEach(row => {
                         if(row.length > 0){
                             let columns = row.split('\t');
-                            console.log(columns, columns.length);
+                            // console.log(columns, columns.length);
                             if (columns[0] == '' || columns[1] == '' || columns[2] == '' || (columns[4] == '' && columns[5] == ''))
                                 return false;
+                            count++;
                             let transaction = {
                                 date: columns[0],
                                 ad_no: columns[1],
@@ -379,20 +382,40 @@
                                 transaction_type: columns[4] == '' ? 'expense' : 'deposit',
                                 amount: columns[4] == '' ? columns[5] : columns[4],
                             };
-                            returnData.push(transaction);
+                            if (count == ((limit * 1) + 1) || count == 1) {
+                                count = 1;
+                                returnData.push([]);
+                            }
+                            returnData[returnData.length-1].push(transaction);
                         }
                     });
-                    console.log(returnData);
+                    console.log(returnData.length);
                     return returnData;
                 },
                 loading2: false,
+                remaining: [],
                 submit(form) {
                     if (this.loading || form.querySelector('[name="transactions"]').value =='') return false;
                     this.loading = true;
                     this.reset();
+                    var calculated_array = this.calculated(form.querySelector('[name="transactions"]').value);
+                    this.remaining = calculated_array;
+
+                    if (!calculated_array.length) {
+                        this.loading = false;
+                        this.$dispatch('alpine-show-message', {
+                            type: 'error',
+                            data: 'No transactions found',
+                        });
+                        return false;
+                    }
+                    this.run_bulk_transactions(this.remaining[0], form);
+                },
+
+                run_bulk_transactions(calculated, form) {
                     var data = new FormData();
                     data.append('_token', '{{ csrf_token() }}');
-                    data.append('transactions', JSON.stringify(this.calculated(form.querySelector('[name="transactions"]').value)));
+                    data.append('transactions', JSON.stringify(calculated));
                     fetch(form.action, {
                         body: data,
                         method: form.method ? form.method : "POST",
@@ -403,21 +426,20 @@
                     .then(res => res.json())
                     .then(json => {
                         console.log(json);
-                        this.loading = false;
                         if (json.status == "success") {
+                            this.remaining.shift();
+                            if (!this.remaining.length) {
+                                this.loading = false;
+                                form.querySelector('[name="transactions"]').value = '';
+                            } else {
+                                this.run_bulk_transactions(this.remaining[0], form);
+                            }
                             this.$dispatch('alpine-show-message', {
                                 type: 'success',
                                 data: json.message,
                             });
-                            form.querySelector('[name="transactions"]').value = '';
-                        }
-                        if (json.errors) {
-                        Object.keys(json.errors).forEach(name => {
-                            var obj = form.querySelector("[name=" + name +"]");
-                            var error = json.errors[name][0];
-                            obj.closest(".form-group").classList.add("validated");
-                            obj.closest(".form-group").querySelector(".error").innerHTML = error;
-                        });
+                        } else {
+                            this.loading = false;
                         }
                     }).catch(e => {
                         console.log(e);

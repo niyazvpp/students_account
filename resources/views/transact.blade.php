@@ -68,7 +68,7 @@
                                         <label for="ad_no" class="label">Search</label>
                                         <input placeholder="Ad. No, Username or Name" @input.debounce="ad_no = trimAndLowerCaseIfString($event.target.value); stop = false; searchStudents()" :value="ad_no" name="ad_no" id="ad_no" type="text" class="input">
                                         <div x-show="ad_no && !stop && !student.name" class="shadow-lg py-1 bg-white z-10 absolute border right-3 left-0 rounded-lg">
-                                            <ul class="overflow-y-auto">
+                                            <ul class="overflow-y-auto bg-white" style="max-height: 150px;">
                                             <template x-for="(result, i) in students">
                                                 <li @click.prevent="!inTag(result.id) && addTag(result.id)" :class="{ 'bg-gray-100 cursor-not-allowed text-gray-400': inTag(result.id) }" class="border-b flex cursor-pointer px-2 py-1 hover:bg-gray-100 text-sm">
                                                     <svg x-show="inTag(result.id)" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -110,7 +110,7 @@
                                     <input type="hidden" name="new" :value="category_new">
                                     <input required @focus="focused = true" @blur.debounce.500ms="focused = false" @input="category_name = $event.target.value; stopCategorySearch = false; category = getCategory(); category_id = getCategory().id" :value="category_name" name="category_name" id="category_name" type="text" class="input">
                                     <div x-show="(category_name && !stopCategorySearch && !category.name) || (focused && !stopCategorySearch && !category.name)" class="shadow-lg py-1 bg-white z-10 absolute border right-3 left-0 rounded-lg">
-                                        <ul class="overflow-y-auto bg-white" style="max-height: 100px;">
+                                        <ul class="overflow-y-auto bg-white" style="max-height: 150px;">
                                         <template x-for="result in categoryResults()">
                                             <li @click="category_name = result.name; category_id = result.id; stopCategorySearch = true; category = getCategory(); category_new = result.new || ''" class="border-b py-2 cursor-pointer px-2 hover:bg-gray-50 text-sm">
                                                 <span x-text="result.name"></span>
@@ -305,7 +305,7 @@
                             @if (!$user->is('student'))
                             <div class="mr-2 mb-2 flex text-left">
                                 <select class="input mr-2 py-2 pr-10 mb-0 border-2 border-gray-300" @change="changeTransactionSetting('user_id', $event.target.value, false)">
-                                    <option value="yes">Mine Only</option>
+                                    <option value="{{ $user->id }}">Mine Only</option>
                                     <option value="">All People</option>
                                 </select>
                                 <select class="input py-2 pr-10 mb-0 border-2 border-gray-300" @change="changeTransactionSetting('class_id', $event.target.value, false)">
@@ -736,6 +736,7 @@ x-show="open" @view-transaction.window="show($event.detail)" class="fixed z-10 i
             var tagged_students = this.tags.map(tag => this.allStudents.find(s => s.id == tag)).filter(o => (o && o.meta && o.meta.class && o.meta.class.id == this.advanced_fields.class_id) || !this.advanced_fields.class_id);
             students_count = students_count - tagged_students.length;
             if (!this.advanced_fields.exclude) students_count = tagged_students.length;
+            if (this.advanced_fields.divide) students_count = 1;
             return amount * students_count;
         },
         advanced_fields: {
@@ -796,6 +797,7 @@ x-show="open" @view-transaction.window="show($event.detail)" class="fixed z-10 i
             } else {
                 delete this.transaction_settings[item];
             }
+            console.log(this.transaction_settings);
             if (!load) return false;
             this.firstLoading = true;
             this.loadTransactions();
@@ -900,7 +902,6 @@ x-show="open" @view-transaction.window="show($event.detail)" class="fixed z-10 i
                 action: 'students',
                 inputs: {
                     search: this.ad_no,
-                    limit: 5,
                     ...self.student_settings
                 }
             }));
